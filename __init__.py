@@ -1,33 +1,21 @@
 import pyttsx# For text to speech
-import pywapi # For weather
 
 from datetime import datetime
 from threading import Timer
 
-NAME = ''
-ZIP_CODE = ''
+from alerts import forecast_info, potd_poets_org, potd_poetry_foundation
+
+NAME = 'Mike'
+ZIP_CODE = '11788'
 SPEECH_SPEED = 130
-WAKE_TIME = r'7:00'
+WAKE_TIME = r'12:08:00'
 
-# Weather information
-class forecast:
-    zip_code = ZIP_CODE
-    weather = pywapi.get_weather_from_weather_com(zip_code,units='imperial')
-
-    weather_today = weather['forecasts'][0]
-    location = weather['location']['name'].split('(')[0]
-
-    temp_high = weather_today['high']
-    temp_low = weather_today['low']
-    day_humidity = weather_today['day']['humidity']
-    day_precip = weather_today['day']['chance_precip']
-    night_humidity = weather_today['night']['humidity']
-    night_precip = weather_today['night']['chance_precip']
-    sunrise = weather_today['sunrise']
-    sunset = weather_today['sunset']
+forecast = forecast_info(ZIP_CODE)
+potd_po = potd_poets_org()
+potd_pf = potd_poetry_foundation()
 
 # Message to be spoken
-def message():
+def get_message():
     message = "Good morning {}. Here is your weather forecast for {}. " \
               "Temperature lows at {} and highs at {}. " \
               "Chance of precipitation in the day is {}% and at night is {}%. " \
@@ -44,14 +32,11 @@ def text_to_speech(text):
 def schedule(alarm_time,scheduled_function):
     alarm_hour = int(alarm_time.split(':')[0])
     alarm_minute = int(alarm_time.split(':')[1])
+    alarm_second = int(alarm_time.split(':')[2])
 
     time_now = datetime.today()
-    run_time = (time_now.replace(day = time_now.day, hour=alarm_hour, minute=alarm_minute, second=0, microsecond=0))
+    run_time = (time_now.replace(day = time_now.day, hour=alarm_hour, minute=alarm_minute, second=alarm_second, microsecond=0))
     delta_t = run_time-time_now
-
-    print(time_now)
-    print(run_time)
-    print(delta_t)
 
     secs = delta_t.seconds+1
 
@@ -60,7 +45,7 @@ def schedule(alarm_time,scheduled_function):
 
 ####################
 
-print(message())
-schedule(WAKE_TIME,lambda: text_to_speech(message()))
+message = get_message()
+schedule(WAKE_TIME,lambda: text_to_speech(message))
 #print(message)
 #text_to_speech(message)
