@@ -5,10 +5,10 @@ from threading import Timer
 
 from alerts import forecast_info, potd_poets_org, potd_poetry_foundation
 
-NAME = 'Mike'
-ZIP_CODE = '11788'
+NAME = ''
+ZIP_CODE = '06519'
 SPEECH_SPEED = 130
-WAKE_TIME = r'12:08:00'
+WAKE_TIME = r'07:00:00'
 
 forecast = forecast_info(ZIP_CODE)
 potd_po = potd_poets_org()
@@ -35,13 +35,15 @@ def schedule(alarm_time,scheduled_function):
     alarm_second = int(alarm_time.split(':')[2])
 
     time_now = datetime.today()
-    run_time = (time_now.replace(day = time_now.day, hour=alarm_hour, minute=alarm_minute, second=alarm_second, microsecond=0))
+    run_time = time_now.replace(day = (time_now.day)+1, hour=alarm_hour, minute=alarm_minute, second=alarm_second, microsecond=0)
     delta_t = run_time-time_now
 
     secs = delta_t.seconds+1
 
     t = Timer(secs,scheduled_function)
     t.start()
+    t2 = Timer(secs,lambda: schedule(alarm_time,scheduled_function))
+    t2.start()
 
 ####################
 
