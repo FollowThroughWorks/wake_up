@@ -1,8 +1,20 @@
 # ADD AUDIO STREAM TO potd_poetry_foundation
+# ADD GOOGLE CALENDAR
+# ADD GOOGLE KEEP
 
-import pywapi # For weather
-from urllib import request
-from bs4 import BeautifulSoup, NavigableString
+# Weather
+import pywapi
+# Poetry
+from urllib import request # web access
+from bs4 import BeautifulSoup, NavigableString # For navigating html
+# Calendar
+import oauth2 # oauth
+import datetime
+import dateutil.parser as parser # formatting datetimes
+from httplib2 import Http
+from apiclient.discovery import build
+
+#-------------------------------------#
 
 # Weather information
 class forecast_info:
@@ -61,3 +73,25 @@ class potd_poetry_foundation:
             self.title = soup.find(id="poem-top").h1.get_text()
             self.author = soup.find(class_="author").a.get_text()
             self.lines = [line.get_text() for line in poem_html.find_all("div")]
+
+# Google calendar events
+class calendar_events:
+    def __init__(self):
+        calendars = ['primary']
+        
+        credentials = oauth2.get_credentials()
+        service = build('calendar', 'v3', http=credentials.authorize(Http()))
+        
+        today = parser.parse(str(datetime.date.today())).isoformat() + 'Z'
+        tomorrow = parser.parse(str(datetime.date.today() + datetime.timedelta(days=1))).isoformat() + 'Z'
+        five_days = parser.parse(str(datetime.date.today() + datetime.timedelta(days=5))).isoformat() + 'Z'
+
+        self.event_list = []
+        for calendar in calendars:
+            self.event_list += service.events().list(calendarId = calendar, timeMin = today, timeMax = five_days).execute().get('items', [])
+
+        for event in self.event_list:
+            print(event['summary'])
+
+if __name__ == '__main__':
+    calendar_events()
