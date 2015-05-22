@@ -6,6 +6,7 @@ from threading import Timer
 from alerts import forecast_info
 from alerts import potd_poets_org, potd_poetry_foundation
 from alerts import calendar
+from alerts import gmail
 
 NAME = 'Mike'
 ZIP_CODE = '06519'
@@ -16,6 +17,8 @@ forecast = forecast_info(ZIP_CODE)
 potd_po = potd_poets_org()
 potd_pf = potd_poetry_foundation()
 calendar = calendar()
+email = gmail()
+
 
 # Message to be spoken
 def get_message():
@@ -25,9 +28,11 @@ def get_message():
               "\n\tChance of precipitation in the day is {}% and at night is {}%. " \
               "\n\tThe sun will set at {}." \
               "\nHere are your events for the day:" \
-              "\n\t{}".format(NAME,forecast.location,forecast.temp_low,forecast.temp_high,
+              "\n\t{}" \
+              "\nYou have {} unread emails".format(NAME,forecast.location,forecast.temp_low,forecast.temp_high,
                                               forecast.day_precip,forecast.night_precip,forecast.sunset,
-                                              [event for event in calendar.events("day")])
+                                              [event for event in calendar.events("day")],
+                                                   email.unread_emails())
     return message
 
 # Reads argument text aloud

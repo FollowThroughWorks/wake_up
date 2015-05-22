@@ -14,6 +14,8 @@ import dateutil.parser as parser # formatting datetimes
 from httplib2 import Http
 from apiclient.discovery import build
 
+
+GOOGLE_CREDENTIALS = oauth2.get_credentials()
 #-------------------------------------#
 
 # Weather information
@@ -77,8 +79,7 @@ class potd_poetry_foundation:
 # Google calendar events
 class calendar:
     def __init__(self):
-        credentials = oauth2.get_credentials()
-        self.service = build('calendar', 'v3', http=credentials.authorize(Http()))
+        self.service = build('calendar', 'v3', http=GOOGLE_CREDENTIALS.authorize(Http()))
 
     def events(self,span):
         calendars = ['primary']
@@ -97,5 +98,27 @@ class calendar:
         if not event_list: event_list = ["You have no events."]
         return event_list
 
+# Google keep
+class gmail:
+    def __init__(self):
+        self.service = build('gmail', 'v1', http=GOOGLE_CREDENTIALS.authorize(Http()))
+
+    def unread_emails(self):
+        emails = self.service.users().messages().list(
+            userId='me',
+            q='is:unread').execute()
+        
+        unread = len(emails['messages'])
+        
+        while 'nextPageToken' in emails:
+            page_token = emails['nextPageToken']
+            emails = self.service.users().messages().list(
+                userId='me',
+                q='is:unread',
+                pageToken=page_token).execute()
+            unread += len(emails['messages'])
+
+        return unread
+
 if __name__ == '__main__':
-    calendar().events("week")
+    pass

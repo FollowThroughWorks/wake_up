@@ -12,7 +12,7 @@ except ImportError:
     flags = None
 
 CREDENTIALS_PATH = 'c:/mg/wake_up/credentials.json'
-SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'
+SCOPES = ['https://www.googleapis.com/auth/gmail.readonly','https://www.googleapis.com/auth/calendar.readonly']
 CLIENT_SECRET_FILE = 'client_secrets.json'
 APPLICATION_NAME = 'Wake Up!'
 
@@ -33,3 +33,6 @@ def get_credentials():
 def delete_credentials():
     os.remove(CREDENTIALS_PATH)
     return
+
+if __name__ == '__main__':
+    delete_credentials()
