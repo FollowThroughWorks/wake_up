@@ -21,18 +21,35 @@ email = gmail()
 
 
 # Message to be spoken
-def get_message():
-    message = "Good morning {}.\n\n" \
-              "Here is your weather forecast for {}: " \
+def get_message(greeting=True,weather=True,events=True,emails=False,poem_po=False,poem_pf=False):
+    message_greeting = "Good morning {}.".format(NAME)
+    
+    message_weather = "Here is your weather forecast for {}: " \
               "\n\tTemperature lows at {} and highs at {}. " \
               "\n\tChance of precipitation in the day is {}% and at night is {}%. " \
-              "\n\tThe sun will set at {}." \
-              "\nHere are your events for the day:" \
-              "\n\t{}" \
-              "\nYou have {} unread emails".format(NAME,forecast.location,forecast.temp_low,forecast.temp_high,
-                                              forecast.day_precip,forecast.night_precip,forecast.sunset,
-                                              [event for event in calendar.events("day")],
-                                                   email.unread_emails())
+              "\n\tThe sun will set at {}.".format(forecast.location,
+                                                   forecast.temp_low,forecast.temp_high,
+                                                   forecast.day_precip,forecast.night_precip,forecast.sunset)
+
+    message_events = "Here are your events for the day:" \
+              "\n\t{}".format('\n'.join(calendar.events("day")))
+
+    message_emails = "You have {} unread emails".format(email.unread_emails())
+
+    message_poem_po = "The poets.org poem of the day is {}, by {}:" \
+              "\n\n{}".format(potd_po.title,potd_po.author,'\n'.join(potd_po.lines))
+
+    message_poem_pf = "The Poetry Foundation poem of the day is {}, by {}:" \
+              "\n\n{}".format(potd_pf.title,potd_pf.author,'\n'.join(potd_pf.lines))
+
+    message = ""
+    if greeting: message += message_greeting + '\n\n'
+    if weather: message += message_weather + '\n\n'
+    if events: message += message_events + '\n\n'
+    if emails: message += message_emails + '\n\n'
+    if poem_po: message += message_poem_po + '\n\n'
+    if poem_pf: message += message_poem_pf + '\n\n'
+    
     return message
 
 # Reads argument text aloud
@@ -61,6 +78,6 @@ def schedule(alarm_time,scheduled_function):
 
 ####################
 
-message = get_message()
+message = get_message(poem_pf=True)
 print(message)
 schedule(WAKE_TIME,lambda: text_to_speech(message))
