@@ -3,32 +3,41 @@ import pyttsx# For text to speech
 from datetime import datetime
 from threading import Timer
 
-from alerts import forecast_info, potd_poets_org, potd_poetry_foundation
+from alerts import forecast_info
+from alerts import potd_poets_org, potd_poetry_foundation
+from alerts import calendar
 
-NAME = ''
+NAME = 'Mike'
 ZIP_CODE = '06519'
 SPEECH_SPEED = 130
-WAKE_TIME = r'07:00:00'
+WAKE_TIME = r'12:21:00'
 
 forecast = forecast_info(ZIP_CODE)
 potd_po = potd_poets_org()
 potd_pf = potd_poetry_foundation()
+calendar = calendar()
 
 # Message to be spoken
 def get_message():
-    message = "Good morning {}. Here is your weather forecast for {}. " \
-              "Temperature lows at {} and highs at {}. " \
-              "Chance of precipitation in the day is {}% and at night is {}%. " \
-              "The sun will set at {}".format(NAME,forecast.location,forecast.temp_low,forecast.temp_high,
-                                              forecast.day_precip,forecast.night_precip,forecast.sunset)
+    message = "Good morning {}.\n\n" \
+              "Here is your weather forecast for {}: " \
+              "\n\tTemperature lows at {} and highs at {}. " \
+              "\n\tChance of precipitation in the day is {}% and at night is {}%. " \
+              "\n\tThe sun will set at {}." \
+              "\nHere are your events for the day:" \
+              "\n\t{}".format(NAME,forecast.location,forecast.temp_low,forecast.temp_high,
+                                              forecast.day_precip,forecast.night_precip,forecast.sunset,
+                                              [event for event in calendar.events("day")])
     return message
 
+# Reads argument text aloud
 def text_to_speech(text):
     engine = pyttsx.init()
     engine.setProperty('rate',SPEECH_SPEED)
     engine.say(text)
     engine.runAndWait()
 
+# Schedule a function to occur at the same time every day
 def schedule(alarm_time,scheduled_function):
     alarm_hour = int(alarm_time.split(':')[0])
     alarm_minute = int(alarm_time.split(':')[1])
@@ -48,6 +57,5 @@ def schedule(alarm_time,scheduled_function):
 ####################
 
 message = get_message()
+print(message)
 schedule(WAKE_TIME,lambda: text_to_speech(message))
-#print(message)
-#text_to_speech(message)

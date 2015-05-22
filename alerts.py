@@ -75,23 +75,27 @@ class potd_poetry_foundation:
             self.lines = [line.get_text() for line in poem_html.find_all("div")]
 
 # Google calendar events
-class calendar_events:
+class calendar:
     def __init__(self):
-        calendars = ['primary']
-        
         credentials = oauth2.get_credentials()
-        service = build('calendar', 'v3', http=credentials.authorize(Http()))
-        
+        self.service = build('calendar', 'v3', http=credentials.authorize(Http()))
+
+    def events(self,span):
+        calendars = ['bergerbritt@gmail.com']
         today = parser.parse(str(datetime.date.today())).isoformat() + 'Z'
         tomorrow = parser.parse(str(datetime.date.today() + datetime.timedelta(days=1))).isoformat() + 'Z'
         five_days = parser.parse(str(datetime.date.today() + datetime.timedelta(days=5))).isoformat() + 'Z'
 
-        self.event_list = []
+        if span == 'day': event_span = tomorrow
+        else: event_span = five_days
+        
+        event_list = []
         for calendar in calendars:
-            self.event_list += service.events().list(calendarId = calendar, timeMin = today, timeMax = five_days).execute().get('items', [])
+            #self.event_list += self.service.events().list(calendarId = calendar, timeMin = today).execute().get('items', [])
+            event_list += [event['summary'] for event in self.service.events().list(calendarId = calendar, timeMin = today, timeMax = event_span).execute().get('items', [])]
 
-        for event in self.event_list:
-            print(event['summary'])
+        if not event_list: event_list = ["You have no events."]
+        return event_list
 
 if __name__ == '__main__':
-    calendar_events()
+    calendar().events("week")
