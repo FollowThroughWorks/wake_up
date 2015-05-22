@@ -81,7 +81,7 @@ class calendar:
         self.service = build('calendar', 'v3', http=credentials.authorize(Http()))
 
     def events(self,span):
-        calendars = ['bergerbritt@gmail.com']
+        calendars = ['primary']
         today = parser.parse(str(datetime.date.today())).isoformat() + 'Z'
         tomorrow = parser.parse(str(datetime.date.today() + datetime.timedelta(days=1))).isoformat() + 'Z'
         five_days = parser.parse(str(datetime.date.today() + datetime.timedelta(days=5))).isoformat() + 'Z'
