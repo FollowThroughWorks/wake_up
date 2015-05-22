@@ -7,12 +7,14 @@ import pywapi
 # Poetry
 from urllib import request # web access
 from bs4 import BeautifulSoup, NavigableString # For navigating html
-# Calendar
+# Calendar & Gmail
 import oauth2 # oauth
+from apiclient.discovery import build
+# Calendar
 import datetime
 import dateutil.parser as parser # formatting datetimes
 from httplib2 import Http
-from apiclient.discovery import build
+
 
 
 GOOGLE_CREDENTIALS = oauth2.get_credentials()

@@ -8,6 +8,8 @@ from alerts import potd_poets_org, potd_poetry_foundation
 from alerts import calendar
 from alerts import gmail
 
+import alarm
+
 NAME = 'Mike'
 ZIP_CODE = '06519'
 SPEECH_SPEED = 130
@@ -59,6 +61,18 @@ def text_to_speech(text):
     engine.say(text)
     engine.runAndWait()
 
+def wake(music=False,speech=True):
+
+    message = get_message(emails=True)
+    
+    if music:
+        alarm.play_song()
+    
+    if speech:
+        print(message)
+        #text_to_speech(message)
+
+    
 # Schedule a function to occur at the same time every day
 def schedule(alarm_time,scheduled_function):
     alarm_hour = int(alarm_time.split(':')[0])
@@ -71,13 +85,14 @@ def schedule(alarm_time,scheduled_function):
 
     secs = delta_t.seconds+1
 
+    print("Scheduling wakeup for {}".format(alarm_time))
     t = Timer(secs,scheduled_function)
     t.start()
     t2 = Timer(secs,lambda: schedule(alarm_time,scheduled_function))
     t2.start()
 
+
 ####################
 
-message = get_message(poem_pf=True)
-print(message)
-schedule(WAKE_TIME,lambda: text_to_speech(message))
+wake(music=True)
+schedule(WAKE_TIME,lambda: wake())
