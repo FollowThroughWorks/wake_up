@@ -24,7 +24,8 @@ GOOGLE_CREDENTIALS = oauth2.get_credentials()
 class forecast_info:
     def __init__(self,zip_in):
         zip_code = zip_in
-        
+
+        print("Retrieving weather info...")
         weather = pywapi.get_weather_from_weather_com(zip_code,units='imperial')
         weather_today = weather['forecasts'][0]
         
@@ -43,6 +44,7 @@ class forecast_info:
 class potd_poets_org:
     def __init__(self):
         # Get poem
+        print("Retrieving poem info...")
         with request.urlopen(r'http://www.poets.org/poetsorg/poem-day') as web_page:
             page_contents = web_page.read()
             soup = BeautifulSoup(page_contents)
@@ -56,6 +58,7 @@ class potd_poets_org:
 class potd_poetry_foundation:
     def __init__(self):
         # Get poem url
+        print("Retrieving poem info...")
         with request.urlopen(r'http://www.poetryfoundation.org/features/audio?show=Poem%20of%20the%20Day') as web_page:
             page_contents = web_page.read()
             soup = BeautifulSoup(page_contents)
@@ -81,9 +84,11 @@ class potd_poetry_foundation:
 # Google calendar events
 class calendar:
     def __init__(self):
+        print("Connecting to calendar...")
         self.service = build('calendar', 'v3', http=GOOGLE_CREDENTIALS.authorize(Http()))
 
     def events(self,span):
+        print("Retrieving calendar info...")
         calendars = ['primary']
         today = parser.parse(str(datetime.date.today())).isoformat() + 'Z'
         tomorrow = parser.parse(str(datetime.date.today() + datetime.timedelta(days=1))).isoformat() + 'Z'
@@ -103,9 +108,11 @@ class calendar:
 # Google keep
 class gmail:
     def __init__(self):
+        print("Connecting to gmail...")
         self.service = build('gmail', 'v1', http=GOOGLE_CREDENTIALS.authorize(Http()))
 
     def unread_emails(self):
+        print("Retrieving gmail info...")
         emails = self.service.users().messages().list(
             userId='me',
             q='is:unread').execute()

@@ -2,8 +2,11 @@ from pydub import AudioSegment
 from pydub import playback
 import time
 
+SONG_PATH = 'You Are All I See.mp3'
+
 def play_song():
-    song = AudioSegment.from_mp3('C:/m/Kalimba.mp3')
+    print("Retrieving alarm...")
+    song = AudioSegment.from_mp3(SONG_PATH)
     song = song[:10000] #first ten seconds
     song_duration = len(song)
     playback.play(song)

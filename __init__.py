@@ -11,9 +11,9 @@ from alerts import gmail
 import alarm
 
 NAME = 'Mike'
-ZIP_CODE = '06519'
+ZIP_CODE = '11788'
 SPEECH_SPEED = 130
-WAKE_TIME = r'12:21:00'
+WAKE_TIME = r'06:30:00'
 
 forecast = forecast_info(ZIP_CODE)
 potd_po = potd_poets_org()
@@ -61,16 +61,14 @@ def text_to_speech(text):
     engine.say(text)
     engine.runAndWait()
 
-def wake(music=False,speech=True):
+def wake(message,music=False,speech=True):
 
-    message = get_message(emails=True)
-    
     if music:
         alarm.play_song()
     
     if speech:
         print(message)
-        #text_to_speech(message)
+        text_to_speech(message)
 
     
 # Schedule a function to occur at the same time every day
@@ -94,5 +92,6 @@ def schedule(alarm_time,scheduled_function):
 
 ####################
 
-wake(music=True)
-schedule(WAKE_TIME,lambda: wake())
+message = get_message(poem_po=True,poem_pf=True)
+wake(message,music=True)
+schedule(WAKE_TIME,lambda: wake(message,music=True))
