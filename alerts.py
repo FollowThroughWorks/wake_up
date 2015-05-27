@@ -7,6 +7,8 @@ import pywapi
 # Poetry
 from urllib import request # web access
 from bs4 import BeautifulSoup, NavigableString # For navigating html
+from io import BytesIO # to convert mp3 url to stream
+from pydub import playback, AudioSegment # to read poem
 # Calendar & Gmail
 import oauth2 # oauth
 from apiclient.discovery import build
@@ -67,9 +69,7 @@ class potd_poetry_foundation:
             poem_url = r'http://www.poetryfoundation.org{}'.format(poem_url_end)
 
             audio_url_end = soup.find(class_="relatedlinks").find(class_="linklist").li.a.get('href')
-            audio_url = r'http://www.poetryfoundation.org{}'.format(audio_url_end)
-
-            # ADD STREAM AUDIO
+            self.audio_url = r'http://www.poetryfoundation.org{}'.format(audio_url_end)
 
         # Get poem
         with request.urlopen(poem_url) as poem_page:
@@ -80,6 +80,11 @@ class potd_poetry_foundation:
             self.title = soup.find(id="poem-top").h1.get_text()
             self.author = soup.find(class_="author").a.get_text()
             self.lines = [line.get_text() for line in poem_html.find_all("div")]
+
+    def read_poem(self):
+        mp3 = request.urlopen(self.audio_url).read()
+        poem = AudioSegment.from_mp3(BytesIO(mp3))
+        playback.play(poem)
 
 # Google calendar events
 class calendar:
