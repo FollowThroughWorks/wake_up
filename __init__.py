@@ -3,10 +3,10 @@ import pyttsx# For text to speech
 from datetime import datetime
 from threading import Timer
 
-from alerts import forecast_info
-from alerts import potd_poets_org, potd_poetry_foundation
-from alerts import calendar
-from alerts import gmail
+from weather import forecast_info
+from poetry import potd_poets_org, potd_poetry_foundation
+from events import google_calendar
+from email_ import gmail
 
 import alarm
 
@@ -20,7 +20,7 @@ WAKE_TIME = r'06:30:00'
 forecast = forecast_info(ZIP_CODE)
 potd_po = potd_poets_org()
 potd_pf = potd_poetry_foundation()
-calendar = calendar()
+calendar = google_calendar()
 email = gmail()
 
 # Reads argument text aloud
@@ -76,7 +76,7 @@ def wake(music=True,greeting=True,weather=True,calendar=False,emails=False,poem_
     if music: alarm.play_song()    
     if greeting: message_greeting()
     if weather: message_weather()
-    if calendar: message_calendar()
+    if calendar: message_events()
     if emails: message_emails()
     if poem_po: message_poem_po()
     if poem_pf: message_poem_pf()
@@ -102,6 +102,6 @@ def schedule(alarm_time,scheduled_function):
 
 ####################
 
-wake(music=False,weather=False,poem_pf=True)
-wake_function = lambda: wake()
+#wake_function = lambda: wake(music=True,greeting=True,weather=True,calendar=True,emails=True,poem_pf=True)
+wake(poem_pf = True, poem_po = True)
 schedule(WAKE_TIME,wake_function)
