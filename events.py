@@ -1,11 +1,11 @@
-import oauth2 # oauth
+import google_oauth2 # oauth
 from apiclient.discovery import build
 
 import datetime
 import dateutil.parser as parser # formatting datetimes
 from httplib2 import Http
 
-GOOGLE_CREDENTIALS = oauth2.get_credentials()
+GOOGLE_CREDENTIALS = google_oauth2.get_credentials()
 
 # Google calendar events
 class google_calendar:

@@ -103,5 +103,5 @@ def schedule(alarm_time,scheduled_function):
 ####################
 
 wake_function = lambda: wake(music=True,greeting=True,weather=True,calendar=True,emails=True,poem_pf=True)
-#wake(poem_pf = True, poem_po = True)
+#wake(music=False,weather=False,calendar=True,emails=True) # For testing
 schedule(WAKE_TIME,wake_function)
