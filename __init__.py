@@ -64,7 +64,7 @@ def message_poem_po():
     text_to_speech(message)
 
 def message_poem_pf():    
-    message = "The Poetry Foundation poem of the day is {}, by {}:".format(potd_pf.title,potd_pf.author)
+    message = "The Poetry Foundation poem of the day is {}, by {}:\n".format(potd_pf.title,potd_pf.author)
     print(message)
     text_to_speech(message)
     print('\n'.join(potd_pf.lines))
@@ -102,6 +102,6 @@ def schedule(alarm_time,scheduled_function):
 
 ####################
 
-#wake_function = lambda: wake(music=True,greeting=True,weather=True,calendar=True,emails=True,poem_pf=True)
-wake(poem_pf = True, poem_po = True)
+wake_function = lambda: wake(music=True,greeting=True,weather=True,calendar=True,emails=True,poem_pf=True)
+#wake(poem_pf = True, poem_po = True)
 schedule(WAKE_TIME,wake_function)

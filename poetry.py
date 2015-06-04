@@ -29,12 +29,15 @@ class potd_poetry_foundation:
 
             self.title = soup.find(class_="title large").get_text()
             self.author = soup.find(class_="author").get_text()
+
+            audio_url_end = soup.find(class_="relatedlinks").find(class_="linklist").li.a.get('href')
+            self.audio_url = r'http://www.poetryfoundation.org{}'.format(audio_url_end)
             
             try:
                 poem_url_end = soup.find("a",class_="title lightview").get('href').split('?')[0]
                 self.poem_url = r'http://www.poetryfoundation.org{}'.format(poem_url_end)
 
-                with request.urlopen(poem_url) as poem_page:
+                with request.urlopen(self.poem_url) as poem_page:
                     page_contents = poem_page.read()
                     soup = BeautifulSoup(page_contents)
                     poem_html = soup.find(class_="poem")
@@ -44,8 +47,6 @@ class potd_poetry_foundation:
             except AttributeError:
                 self.lines = ["This poem text is not available."]
 
-            audio_url_end = soup.find(class_="relatedlinks").find(class_="linklist").li.a.get('href')
-            self.audio_url = r'http://www.poetryfoundation.org{}'.format(audio_url_end)
 
 
     def read_poem(self):
@@ -54,4 +55,5 @@ class potd_poetry_foundation:
         playback.play(poem)
 
 if __name__ == '__main__':
-    potd_poetry_foundation()
+    print(potd_poets_org().lines)
+    print(potd_poetry_foundation().lines)
