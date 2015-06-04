@@ -71,7 +71,7 @@ def message_poem_pf():
 
 def message_facebook():
     fb_notifications = notifications()
-    message = 'You have {} unread facebook notifications.'.format(fb_notifications.amount_unread)
+    message = 'You have {} unseen facebook notifications and {} unread facebook notifications.'.format(fb_notifications.unseen_count,fb_notifications.unread_count)
     print(message)
     text_to_speech(message)
 
