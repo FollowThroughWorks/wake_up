@@ -6,7 +6,7 @@ from wsgiref.simple_server import make_server
 import json
 
 # JSON file with app id and secret
-APP_INFO_PATH = 'facebook_app_info.json'
+APP_INFO_PATH = 'data/facebook_app_info.json'
 
 with open(APP_INFO_PATH) as app_info_file:
     app_info = json.loads(app_info_file.read())
@@ -16,8 +16,8 @@ with open(APP_INFO_PATH) as app_info_file:
 site_url = r'http://localhost:8051/'
 permissions = 'manage_notifications'
 
-code_file = 'facebook_code.txt'
-token_file = 'facebook_token.txt'
+code_file = 'data/facebook_code.txt'
+token_file = 'data/facebook_token.txt'
 
 # Set up server to handle redirect request from facebook
 def run_server(host,port,fcn):
@@ -74,6 +74,7 @@ def get_token():
     time.sleep(5)
     with open(code_file) as f:
         code = f.read().split('=')[1]
+    os.remove(code_file)
 
     # 4) Go to url with APP ID & SECRET, REDIRECT URL, and now-received CODE, to receive TOKEN; save token
     get_token_url = 'https://graph.facebook.com/v2.3/oauth/access_token?' \
