@@ -11,9 +11,9 @@ try:
 except ImportError:
     flags = None
 
-CREDENTIALS_PATH = 'c:/mg/wake_up/google_credentials.json'
+CREDENTIALS_PATH = 'data/google_credentials.json'
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly','https://www.googleapis.com/auth/calendar.readonly']
-CLIENT_SECRET_FILE = 'google_client_secrets.json'
+CLIENT_SECRET_FILE = 'data/google_client_secrets.json'
 APPLICATION_NAME = 'Wake Up!'
 
 def get_credentials():

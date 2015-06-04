@@ -12,6 +12,7 @@ class any_do:
 
         anydo_api = AnyDoAPI(username=user_,password=pass_)
 
-        tasks = anydo_api.get_all_tasks()
-        self.task_names = [task['title'] for task in tasks]
-        self.task_count = len(tasks)
+        self.tasks = anydo_api.get_all_tasks()
+        self.unchecked_tasks = [task for task in self.tasks if task['status'] == 'UNCHECKED']  
+        self.unchecked_task_names = [task['title'] for task in self.unchecked_tasks]
+        self.unchecked_task_count = len(self.unchecked_tasks)

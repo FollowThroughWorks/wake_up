@@ -8,6 +8,7 @@ from poetry import potd_poets_org, potd_poetry_foundation
 from events import google_calendar
 from email_ import gmail
 from facebook import notifications
+from anydo_ import any_do
 
 import alarm
 
@@ -75,8 +76,14 @@ def message_facebook():
     print(message)
     text_to_speech(message)
 
+def message_anydo():
+    ad = any_do()
+    message = 'You have {} unchecked tasks on Any Do'.format(ad.unchecked_task_count)
+    print(message)
+    text_to_speech(message)
+
 # Method that runs in morning
-def wake(music=True,greeting=True,weather=True,calendar=False,emails=False,poem_po=False,poem_pf=False,fb=False):
+def wake(music=True,greeting=True,weather=True,calendar=False,emails=False,poem_po=False,poem_pf=False,fb=False,ad=False):
 
     if music: alarm.play_song()    
     if greeting: message_greeting()
@@ -86,6 +93,7 @@ def wake(music=True,greeting=True,weather=True,calendar=False,emails=False,poem_
     if poem_po: message_poem_po()
     if poem_pf: message_poem_pf()
     if fb: message_facebook()
+    if ad: message_anydo()
 
 # Schedule a function to occur at the same time every day
 def schedule(alarm_time,scheduled_function):
@@ -109,5 +117,5 @@ def schedule(alarm_time,scheduled_function):
 ####################
 
 wake_function = lambda: wake(music=True,greeting=True,weather=True,calendar=True,emails=True,poem_pf=True)
-wake(music=False,weather=False,fb=True) # For testing
+wake(music=False,weather=False,ad=True) # For testing
 schedule(WAKE_TIME,wake_function)
