@@ -1,7 +1,8 @@
-import pywapi
+import pywapi # For retrieving weather info
+from utilities # For text to speech
 
 # Weather information
-class forecast_info:
+class forecast:
     def __init__(self,zip_in):
         zip_code = zip_in
 
@@ -19,3 +20,15 @@ class forecast_info:
         self.night_precip = weather_today['night']['chance_precip']
         self.sunrise = weather_today['sunrise']
         self.sunset = weather_today['sunset']
+
+    def temp_message(self):
+        message = "Today's temperature will range from {} to {} degrees".format(self.temp_low,self.temp_high)
+        tts(message)
+
+    def precipitation_message(self):
+        message = "Chance of precipitation in the day is {}% and at night is {}%".format(self.day_precip,self.night_precip)
+        tts(message)
+
+    def sunset_message(self):
+        message = "Sunset is at {}".format(self.sunset)
+        tts(message)

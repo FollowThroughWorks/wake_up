@@ -1,99 +1,7 @@
-import pyttsx# For text to speech
+from datetime import datetime # For scheduling the alarm
+from threading import Timer # For scheduling the alarm
 
-from datetime import datetime
-from threading import Timer
-
-from modules.weather import forecast_info
-from modules.poetry import potd_poets_org, potd_poetry_foundation
-from modules.events import google_calendar
-from modules.email_ import gmail
-from modules.facebook import notifications
-from modules.anydo_ import any_do
-
-import modules.alarm as alarm
-
-# Constants
-NAME = 'Mike'
-ZIP_CODE = '11788'
-SPEECH_SPEED = 130
-WAKE_TIME = r'07:00:00'
-
-# Reads argument text aloud
-def text_to_speech(text):
-    engine = pyttsx.init()
-    engine.setProperty('rate',SPEECH_SPEED)
-    engine.say(text)
-    engine.runAndWait()
-
-# Methods for reading messages
-def message_greeting():
-    message = "Good morning {}.".format(NAME)
-    print(message)
-    text_to_speech(message)
-
-def message_weather():
-    forecast = forecast_info(ZIP_CODE)
-    message = "Here is your weather forecast for {}: " \
-              "\n\tTemperature lows at {} and highs at {}. " \
-              "\n\tChance of precipitation in the day is {}% and at night is {}%. " \
-              "\n\tThe sun will set at {}.".format(forecast.location,
-                                                   forecast.temp_low,forecast.temp_high,
-                                                   forecast.day_precip,forecast.night_precip,forecast.sunset)
-    print(message)
-    text_to_speech(message)
-
-def message_events():
-    calendar = google_calendar()
-    message = "Here are your events for the day:" \
-              "\n\t{}".format('\n'.join(calendar.events("day")))
-    print(message)
-    text_to_speech(message)
-
-def message_emails():
-    email = gmail()
-    message = "You have {} unread emails".format(email.unread_emails())
-    print(message)
-    text_to_speech(message)
-
-def message_poem_po():
-    potd_po = potd_poets_org()
-    message = "The poets.org poem of the day is {}, by {}:" \
-              "\n\n{}".format(potd_po.title,potd_po.author,'\n'.join(potd_po.lines))
-    print(message)
-    text_to_speech(message)
-
-def message_poem_pf():
-    potd_pf = potd_poetry_foundation()
-    message = "The Poetry Foundation poem of the day is {}, by {}:\n".format(potd_pf.title,potd_pf.author)
-    print(message)
-    text_to_speech(message)
-    print('\n'.join(potd_pf.lines))
-    potd_pf.read_poem()
-
-def message_facebook():
-    fb_notifications = notifications()
-    message = 'You have {} unseen facebook notifications and {} unread facebook notifications.'.format(fb_notifications.unseen_count,fb_notifications.unread_count)
-    print(message)
-    text_to_speech(message)
-
-def message_anydo():
-    ad = any_do()
-    message = 'You have {} unchecked tasks on Any Do'.format(ad.unchecked_task_count)
-    print(message)
-    text_to_speech(message)
-
-# Method that runs in morning
-def wake(music=True,greeting=True,weather=True,calendar=False,emails=False,poem_po=False,poem_pf=False,fb=False,ad=False):
-
-    if music: alarm.play_song()    
-    if greeting: message_greeting()
-    if weather: message_weather()
-    if calendar: message_events()
-    if emails: message_emails()
-    if poem_po: message_poem_po()
-    if poem_pf: message_poem_pf()
-    if fb: message_facebook()
-    if ad: message_anydo()
+import modules.alarm # For calling the functions to do things
 
 # Schedule a function to occur at the same time every day
 def schedule(alarm_time,scheduled_function):
@@ -113,10 +21,33 @@ def schedule(alarm_time,scheduled_function):
     t2 = Timer(secs,lambda: schedule(alarm_time,scheduled_function))
     t2.start()
 
+# What actually happens
+def run_wake(options_frame):
+    modules.alarm.play_song(3)
+    function_queue = []
+    if options_frame.alarm.check_state.get() == 1:
+        alarm_args = (options_frame.alarm.duration.get(),options_frame.alarm.filename.get())
+        function_queue.append([modules.alarm.play_song,alarm_args])
 
-####################
+        print(function_queue)
 
-if __name__ == '__main__':
-    wake_function = lambda: wake(music=True,greeting=True,weather=True,calendar=True,emails=True,poem_po=True,poem_pf=True,fb=True)
-    # wake_function() # For testing
-    schedule(WAKE_TIME,wake_function)
+    if options_frame.weather.check_state.get() == 1:
+        forecast = modules.weather.forecast(options_frame.weather.zip.get())
+        if options_frame.weather.temp_check.get() == 1:
+            function_queue.append([forecast.temp_message,()])
+        
+    for function_args_pair in function_queue:
+        function_args_pair[0](*function_args_pair[1])
+        
+    wake_time = options_frame.time.wake_time.get()
+    greeting = True
+    music = options_frame.alarm.check_state.get()
+    weather = options_frame.weather.check_state.get()
+    events = options_frame.events.check_state.get()
+    emails = options_frame.emails.check_state.get()
+    poem_po = options_frame.poetry.poets_org.check_state.get()
+    poem_pf = options_frame.poetry.poetry_foundation.check_state.get()
+    social_media = options_frame.social_media.check_state.get()
+    wake_function = lambda: wake(music=music,greeting=greeting,weather=weather,calendar=events,emails=emails,poem_po=poem_po,poem_pf=poem_pf,fb=social_media)
+    schedule(wake_time,wake_function)
+

@@ -1,8 +1,21 @@
-import json
-from GUI import toggle_subchoices
-import wake
-import modules
+import json # For loading preferences
 
+def toggle_subchoices(parent_frame):
+    check_state = parent_frame.check_state.get()
+    print("{}: {}".format(type(parent_frame),check_state))
+    for choice_object in parent_frame.winfo_children()[1:]:
+        # For all child objects except the first (the check button), toggle if it's disabled or not
+        if check_state:
+            enable_widget(choice_object)
+        else:
+            disable_widget(choice_object)
+            
+def text_to_speech(text):
+    engine = pyttsx.init()
+    engine.setProperty('rate',SPEECH_SPEED)
+    engine.say(text)
+    engine.runAndWait()
+    
 def load_settings(options_frame):
     with open('settings.json','r') as in_json:
         settings = json.loads(in_json.read())
@@ -95,27 +108,3 @@ def save_settings(options_frame):
     print("Saving settings")
     with open('settings.json', 'w') as out_json:
         json.dump(settings, out_json)
-    
-def run_wake(options_frame):
-    function_queue = []
-    if options_frame.alarm.check_state.get() == 1:
-        alarm_args = (options_frame.alarm.duration.get(),options_frame.alarm.filename.get())
-        function_queue.append([modules.alarm.play_song,alarm_args])
-
-    if options_frame.weather.check_state.get() == 1:
-        
-        
-    for function_args_pair in function_queue:
-        function_args_pair[0](*function_args[1])
-        
-    wake_time = options_frame.time.wake_time.get()
-    greeting = True
-    music = options_frame.alarm.check_state.get()
-    weather = options_frame.weather.check_state.get()
-    events = options_frame.events.check_state.get()
-    emails = options_frame.emails.check_state.get()
-    poem_po = options_frame.poetry.poets_org.check_state.get()
-    poem_pf = options_frame.poetry.poetry_foundation.check_state.get()
-    social_media = options_frame.social_media.check_state.get()
-    wake_function = lambda: wake.wake(music=music,greeting=greeting,weather=weather,calendar=events,emails=emails,poem_po=poem_po,poem_pf=poem_pf,fb=social_media)
-    wake.schedule(wake_time,wake_function)
