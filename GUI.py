@@ -2,8 +2,8 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter.filedialog import askopenfilename
 
-import utilities # For saving and loading preferences
-import wake # For scheduling waking when Wake Up! is pressed
+from utilities import load_settings, save_settings # For saving and loading preferences
+from wake import run_wake # For scheduling waking when Wake Up! is pressed
 
 ###### METHODS #########
 def toggle_subchoices(parent_frame):
@@ -325,10 +325,10 @@ class ButtonsFrame(ttk.Frame):
         ttk.Frame.__init__(self,parent)
         self.parent = parent
 
-        save_settings_button = ttk.Button(self,text="Save Settings",command=lambda: utilities.save_settings(self.parent.options))
+        save_settings_button = ttk.Button(self,text="Save Settings",command=lambda: save_settings(self.parent.options))
         save_settings_button.grid(column=1,row=1,sticky='NSEW',padx=30)
 
-        run_button = ttk.Button(self,text="Wake Up!",command=lambda: wake.run_wake(self.parent.options))
+        run_button = ttk.Button(self,text="Wake Up!",command=lambda: run_wake(self.parent.options))
         run_button.grid(column=2,row=1,sticky='NSEW',padx=30)
 
         cancel_button = ttk.Button(self,text="Cancel",command=lambda: parent.parent.destroy())
@@ -369,7 +369,7 @@ class MainApplication(tk.Frame):
         self.rowconfigure(1,weight=1)
 
         # Load options
-        utilities.load_settings(self.options)
+        load_settings(self.options)
 
         for frame in self.options.winfo_children():
             try:

@@ -1,7 +1,7 @@
 from datetime import datetime # For scheduling the alarm
 from threading import Timer # For scheduling the alarm
 
-import modules # For calling the functions to do things
+import wake_modules.alarm # For calling the functions to do things
 
 # Schedule a function to occur at the same time every day
 def schedule(alarm_time,scheduled_function):
@@ -27,7 +27,7 @@ def run_wake(options_frame):
     function_queue = []
     if options_frame.alarm.check_state.get() == 1:
         alarm_args = (options_frame.alarm.duration.get(),options_frame.alarm.filename.get())
-        function_queue.append([modules.alarm.play_song,alarm_args])
+        function_queue.append([wake_modules.alarm.play_song,alarm_args])
 
     if options_frame.weather.check_state.get() == 1:
         forecast = modules.weather.forecast(options_frame.weather.zip.get())
