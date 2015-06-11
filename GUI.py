@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter.filedialog import askopenfilename
+
 import utilities # For saving and loading preferences
 import wake # For scheduling waking when Wake Up! is pressed
 
@@ -369,6 +370,13 @@ class MainApplication(tk.Frame):
 
         # Load options
         utilities.load_settings(self.options)
+
+        for frame in self.options.winfo_children():
+            try:
+                toggle_subchoices(frame)
+            except:
+                print("No checkbox for {}".format(type(frame)))
+                pass
 
         # Updates the alarm duration label on first load
         update_label("Duration: {}".format(self.options.alarm.duration.get()),self.options.alarm.length_label)

@@ -1,15 +1,5 @@
 import json # For loading preferences
 
-def toggle_subchoices(parent_frame):
-    check_state = parent_frame.check_state.get()
-    print("{}: {}".format(type(parent_frame),check_state))
-    for choice_object in parent_frame.winfo_children()[1:]:
-        # For all child objects except the first (the check button), toggle if it's disabled or not
-        if check_state:
-            enable_widget(choice_object)
-        else:
-            disable_widget(choice_object)
-            
 def text_to_speech(text):
     engine = pyttsx.init()
     engine.setProperty('rate',SPEECH_SPEED)
@@ -52,12 +42,7 @@ def load_settings(options_frame):
     options_frame.todo.check_state.set(settings['to do']['check_state'])    
     options_frame.todo.any_do.set(settings['to do']['anydo'])
 
-    for frame in options_frame.winfo_children():
-        try:
-            toggle_subchoices(frame)
-        except:
-            print("No checkbox for {}".format(type(frame)))
-            pass
+
     
 def save_settings(options_frame):
     settings = {
