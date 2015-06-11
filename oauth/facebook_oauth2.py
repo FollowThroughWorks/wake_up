@@ -4,6 +4,7 @@ import threading
 import time
 from wsgiref.simple_server import make_server
 import json
+import os
 
 # JSON file with app id and secret
 APP_INFO_PATH = 'data/facebook_app_info.json'
