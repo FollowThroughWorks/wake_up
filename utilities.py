@@ -1,6 +1,7 @@
 import json
 from GUI import toggle_subchoices
 import wake
+import modules
 
 def load_settings(options_frame):
     with open('settings.json','r') as in_json:
@@ -96,6 +97,17 @@ def save_settings(options_frame):
         json.dump(settings, out_json)
     
 def run_wake(options_frame):
+    function_queue = []
+    if options_frame.alarm.check_state.get() == 1:
+        alarm_args = (options_frame.alarm.duration.get(),options_frame.alarm.filename.get())
+        function_queue.append([modules.alarm.play_song,alarm_args])
+
+    if options_frame.weather.check_state.get() == 1:
+        
+        
+    for function_args_pair in function_queue:
+        function_args_pair[0](*function_args[1])
+        
     wake_time = options_frame.time.wake_time.get()
     greeting = True
     music = options_frame.alarm.check_state.get()
