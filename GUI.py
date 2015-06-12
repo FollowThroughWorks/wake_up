@@ -162,12 +162,15 @@ class WeatherFrame(ChoiceAndSubchoicesFrame):
     def __init__(self,parent):
         ChoiceAndSubchoicesFrame.__init__(self,parent,"Weather")
 
+        vcmd = self.register(self.validate_zip)
+        
         # Zip Code
         self.zip = tk.IntVar()
 
         zip_label = ttk.Label(self,text="Zip Code")
         zip_label.grid(column=1,row=1)
-        zip_entry = ttk.Entry(self,textvariable=self.zip)
+        zip_entry = ttk.Entry(self,textvariable=self.zip,validate='focusout',
+                              validatecommand = (vcmd,'%P'))
         zip_entry.grid(column=2,row=1)
 
 
@@ -191,6 +194,22 @@ class WeatherFrame(ChoiceAndSubchoicesFrame):
         self.rowconfigure(1,weight=1)
         self.rowconfigure(2,weight=1)
 
+    def validate_zip(self,new_text):
+        # If there is text
+        if new_text:
+            try:
+                assert len(new_text) == 5
+                return True
+            except (AssertionError):
+                alert_window("Please insert a 5-digit zip")
+                self.zip.set("00000")
+                return True
+        # If there is no text
+        else:
+            alert_window("Please insert a 5-digit zip")
+            self.zip.set("00000")
+            return False
+
 class EventsFrame(ChoiceAndSubchoicesFrame):
     def __init__(self,parent):
         ChoiceAndSubchoicesFrame.__init__(self,parent,"Events")
@@ -202,7 +221,7 @@ class EventsFrame(ChoiceAndSubchoicesFrame):
         self.facebook = tk.BooleanVar()
         facebook_check = ttk.Checkbutton(self,text="Facebook",variable=self.facebook)
         facebook_check.grid(column=2,row=1)
-        
+
         toggle_subchoices(self)
 
         self.columnconfigure(1,weight=1)
