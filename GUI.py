@@ -3,7 +3,7 @@ from tkinter import ttk
 from tkinter.filedialog import askopenfilename
 
 from utilities import load_settings, save_settings # For saving and loading preferences
-from wake import run_wake # For scheduling waking when Wake Up! is pressed
+from wake import run_wake_from_gui # For scheduling waking when Wake Up! is pressed
 import modules.alarm
 
 ###### METHODS #########
@@ -92,6 +92,8 @@ class ChoiceAndSubchoicesFrame(tk.Frame):
         
         # Padding between elements
         for child in self.winfo_children(): child.grid_configure(padx=2,pady=2)
+
+        
 
 class SubSubchoicesFrame(ChoiceAndSubchoicesFrame):
     def __init__(self,parent,option_name):
@@ -254,6 +256,11 @@ class EmailsFrame(ChoiceAndSubchoicesFrame):
         gmail_check.grid(column=1,row=1)
         
         toggle_subchoices(self)
+            
+        self.columnconfigure(1,weight=1)
+        self.columnconfigure(2,weight=1)
+        self.rowconfigure(1,weight=1)
+        self.rowconfigure(2,weight=1)
                
 class PoetryFrame(ChoiceAndSubchoicesFrame):
     def __init__(self,parent):
@@ -332,6 +339,11 @@ class SocialMediaFrame(ChoiceAndSubchoicesFrame):
         fb_notifications_check.grid(column=1,row=1)
 
         toggle_subchoices(self)
+        
+        self.columnconfigure(1,weight=1)
+        self.columnconfigure(2,weight=1)
+        self.rowconfigure(1,weight=1)
+        self.rowconfigure(2,weight=1)
 
 class ToDoFrame(ChoiceAndSubchoicesFrame):
     def __init__(self,parent):
@@ -342,6 +354,11 @@ class ToDoFrame(ChoiceAndSubchoicesFrame):
         any_do_check.grid(column=1,row=1)
         
         toggle_subchoices(self)
+
+        self.columnconfigure(1,weight=1)
+        self.columnconfigure(2,weight=1)
+        self.rowconfigure(1,weight=1)
+        self.rowconfigure(2,weight=1)
            
 # ----------- Container Frames ------------- #
 
@@ -358,22 +375,22 @@ class OptionsFrame(tk.Frame):
         self.alarm.grid(column=1,row=2,sticky='NSEW')
 
         self.weather = WeatherFrame(self)
-        self.weather.grid(column=1,row=3,sticky='NSEW')
+        self.weather.grid(column=2,row=2,sticky='NSEW')
+
+        self.emails = EmailsFrame(self)
+        self.emails.grid(column=1,row=3,sticky='NSEW')
+
+        self.todo = ToDoFrame(self)
+        self.todo.grid(column=2,row=3,sticky='NSEW')
 
         self.events = EventsFrame(self)
         self.events.grid(column=1,row=4,sticky='NSEW')
-
-        self.emails = EmailsFrame(self)
-        self.emails.grid(column=1,row=5,sticky='NSEW')
+        
+        self.social_media = SocialMediaFrame(self)
+        self.social_media.grid(column=2,row=4,sticky='NSEW')
 
         self.poetry = PoetryFrame(self)
-        self.poetry.grid(column=2,row=2,sticky='NSEW')
-
-        self.social_media = SocialMediaFrame(self)
-        self.social_media.grid(column=2,row=3,sticky='NSEW')
-
-        self.todo = ToDoFrame(self)
-        self.todo.grid(column=2,row=4,sticky='NSEW')
+        self.poetry.grid(column=1,row=5,sticky='NSEW')
 
         self.columnconfigure(1,weight=1)
         self.columnconfigure(2,weight=1)
@@ -399,11 +416,11 @@ class ButtonsFrame(ttk.Frame):
         save_settings_button = ttk.Button(self,text="Save Settings",command=lambda: save_settings(self.parent.options))
         save_settings_button.grid(column=1,row=1,sticky='NSEW',padx=30)
 
-        self.run_button = ttk.Button(self,text="Schedule",command=lambda: run_wake(self.parent.options))
+        self.run_button = ttk.Button(self,text="Schedule",command=lambda: run_wake_from_gui(self.parent.options))
         self.run_button.grid(column=2,row=1,sticky='NSEW',padx=30)
 
-        cancel_button = ttk.Button(self,text="Cancel",command=lambda: parent.parent.destroy())
-        cancel_button.grid(column=3,row=1,sticky='NSEW',padx=30)
+        close_button = ttk.Button(self,text="Close",command=lambda: parent.parent.destroy())
+        close_button.grid(column=3,row=1,sticky='NSEW',padx=30)
 
         self.columnconfigure(1,weight=1)
         self.columnconfigure(2,weight=1)
@@ -455,5 +472,6 @@ class MainApplication(tk.Frame):
 if __name__ == "__main__":
     root = tk.Tk()
     root.title("Wake Up!")
+    root.iconbitmap('images/clock.ico')
     MainApplication(root).pack(side="top",fill="both",expand=True)
     root.mainloop()

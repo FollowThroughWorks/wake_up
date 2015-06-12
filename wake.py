@@ -32,7 +32,7 @@ def run_functions(function_queue):
         function_args_pair[0](*function_args_pair[1])
         
 # What actually happens
-def run_wake(options_frame):
+def run_wake_from_gui(options_frame):
     
     # List of [function,(args)] to call at scheduled time
     function_queue = []
@@ -124,4 +124,3 @@ def run_wake(options_frame):
     '''
     wake_function = lambda: run_functions(function_queue)
     schedule(wake_time,wake_function)
-
