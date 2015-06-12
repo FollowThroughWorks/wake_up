@@ -1,5 +1,6 @@
 import json # For loading preferences
 import pyttsx # For reading text
+import modules.alarm # For loading alarm scale size
 
 SPEECH_SPEED = 130
 
@@ -17,6 +18,8 @@ def load_settings(options_frame):
     options_frame.alarm.check_state.set(settings['alarm']['check_state'])
     options_frame.alarm.filename.set(settings['alarm']['file'])
     options_frame.alarm.duration.set(settings['alarm']['duration'])
+    alarm_length = modules.alarm.sound(settings['alarm']['file']).length
+    options_frame.alarm.alarm_length_scale.configure(to=alarm_length)
 
     options_frame.weather.check_state.set(settings['weather']['check_state'])    
     options_frame.weather.zip.set(settings['weather']['zip'])
@@ -26,7 +29,7 @@ def load_settings(options_frame):
 
     options_frame.events.check_state.set(settings['events']['check_state'])    
     options_frame.events.google_cal.set(settings['events']['google']),
-    options_frame.events.facebook.set(settings['events']['facebook'])
+    #options_frame.events.facebook.set(settings['events']['facebook'])
 
     options_frame.emails.check_state.set(settings['emails']['check_state'])
     options_frame.emails.gmail.set(settings['emails']['gmail'])
@@ -65,7 +68,7 @@ def save_settings(options_frame):
 	"events": {
                 "check_state": options_frame.events.check_state.get(),
 		"google": options_frame.events.google_cal.get(),
-		"facebook": options_frame.events.facebook.get()
+		"facebook": ""#options_frame.events.facebook.get()
 	},
 	"emails": {
                 "check_state": options_frame.emails.check_state.get(),

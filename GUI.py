@@ -4,6 +4,7 @@ from tkinter.filedialog import askopenfilename
 
 from utilities import load_settings, save_settings # For saving and loading preferences
 from wake import run_wake # For scheduling waking when Wake Up! is pressed
+import modules.alarm
 
 ###### METHODS #########
 def toggle_subchoices(parent_frame):
@@ -53,6 +54,15 @@ def alert_window(message):
 
     button = ttk.Button(alert, text="Okay", command=alert.destroy)
     button.grid(column=1,row=2)
+
+def choose_alarm(alarm_frame):
+    file_choice(alarm_frame)
+    if not '.mp3' in alarm_frame.filename.get():
+        alert_window("Please choose an mp3 file")
+        alarm_frame.filename.set("Invalid File")
+    else:
+        file_length = modules.alarm.sound(alarm_frame.filename.get()).length
+        alarm_frame.alarm_length_scale.configure(to=file_length)
     
 ###### CLASSES TO INHERIT FROM ########
     
@@ -118,7 +128,11 @@ class TimeFrame(ttk.Frame):
                 assert len(minute) == 2
                 assert int(minute) < 61
                 assert len(hour) > 0 and len(hour) < 3
-                assert int(hour) < 13
+                assert int(hour) < 25
+                if len(hour) == 1:
+                    print("HOUR")
+                    hour = "0{}".format(hour)
+                self.wake_time.set('{}:{}:00'.format(hour,minute))
                 self.parent.parent.buttons.run_button.state(['!disabled'])
             except (IndexError,AssertionError):
                 alert_window("Please insert a time between 00:00 and 23:99")
@@ -140,18 +154,18 @@ class AlarmFrame(ChoiceAndSubchoicesFrame):
         entry_one.grid(column=1,row=1)
 
         # File select button
-        file_select_button = ttk.Button(self,text="Select File",command=lambda: file_choice(self))
+        file_select_button = ttk.Button(self,text="Select File",command=lambda: choose_alarm(self))
         file_select_button.grid(column=2,row=1)
 
         # Song length scale
         self.length_label = ttk.Label(self,text="Duration: 0")
         self.length_label.grid(column=1,row=3,columnspan=2)
-        
+       
         self.duration = tk.IntVar()
-        alarm_length_scale = ttk.Scale(self,orient=tk.HORIZONTAL,from_=1,to=200,variable=self.duration,value=1)
-        alarm_length_scale.config(command=lambda x: update_label("Duration: {}".format(self.duration.get()),self.length_label))
-        alarm_length_scale.grid(column=1,row=2,columnspan=2)
-        
+        self.alarm_length_scale = ttk.Scale(self,orient=tk.HORIZONTAL,from_=1,to=200,variable=self.duration,value=1)
+        self.alarm_length_scale.config(command=lambda x: update_label("Duration: {}".format(self.duration.get()),self.length_label))
+        self.alarm_length_scale.grid(column=1,row=2,columnspan=2)
+
         # Disable everything but the main choice
         toggle_subchoices(self)
 
@@ -217,11 +231,13 @@ class EventsFrame(ChoiceAndSubchoicesFrame):
         self.google_cal = tk.BooleanVar()
         google_cal_check = ttk.Checkbutton(self,text="Google",variable=self.google_cal)
         google_cal_check.grid(column=1,row=1)
-
+        
+        '''
         self.facebook = tk.BooleanVar()
         facebook_check = ttk.Checkbutton(self,text="Facebook",variable=self.facebook)
         facebook_check.grid(column=2,row=1)
-
+        '''
+        
         toggle_subchoices(self)
 
         self.columnconfigure(1,weight=1)

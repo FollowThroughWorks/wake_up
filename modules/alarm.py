@@ -2,13 +2,18 @@ from pydub import AudioSegment
 from pydub import playback
 import time
 
-def play_song(duration_secs,song_path='music/bugle.mp3'):
-    print("Retrieving alarm...")
-    song = AudioSegment.from_mp3(song_path)
-    song = song[:(duration_secs*1000)] #first ten seconds
-    song_duration = len(song)
-    playback.play(song)
-    #time.sleep(song_duration/1000)
+class sound():
+    def __init__(self,song_path='bugle.mp3'):
+        print("Retrieving alarm...")
+        self.audio = AudioSegment.from_mp3(song_path)
+        self.length = len(self.audio)/1000
+    
+    def play(self,duration_secs):
+        audio = self.audio[:(duration_secs*1000)]
+        audio_duration = len(audio)
+        playback.play(audio)
+        #time.sleep(song_duration/1000)
 
 if __name__ == '__main__':
-    play_song()
+    s = sound()
+    s.play_song(3)

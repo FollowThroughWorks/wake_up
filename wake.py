@@ -39,8 +39,9 @@ def run_wake(options_frame):
 
     # Alarm
     if options_frame.alarm.check_state.get() == 1:
-        alarm_args = (options_frame.alarm.duration.get(),options_frame.alarm.filename.get())
-        function_queue.append([modules.alarm.play_song,alarm_args])
+        sound = modules.alarm.sound(options_frame.alarm.filename.get())
+        alarm_args = (options_frame.alarm.duration.get(),)
+        function_queue.append([sound.play,alarm_args])
 
     # Weather
     if options_frame.weather.check_state.get() == 1:
