@@ -1,4 +1,7 @@
 import json # For loading preferences
+import pyttsx # For reading text
+
+SPEECH_SPEED = 130
 
 def text_to_speech(text):
     engine = pyttsx.init()

@@ -1,5 +1,6 @@
 import oauth.google_oauth2 as google_oauth2 # oauth
 from apiclient.discovery import build
+from utilities import text_to_speech as tts # For text to speech
 
 import datetime
 import dateutil.parser as parser # formatting datetimes
@@ -30,3 +31,8 @@ class google_calendar:
 
         if not event_list: event_list = ["You have no events."]
         return event_list
+
+    def events_message(self):
+        message = "Your events for the day are: {}'".format([event for event in self.events('day')])
+        print(message)
+        tts(message)

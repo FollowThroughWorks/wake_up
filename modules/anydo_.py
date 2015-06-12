@@ -1,5 +1,6 @@
 from anydo.api import AnyDoAPI
 import json
+from utilities import text_to_speech as tts # For text to speech
 
 class any_do:
     def __init__(self):
@@ -16,3 +17,8 @@ class any_do:
         self.unchecked_tasks = [task for task in self.tasks if task['status'] == 'UNCHECKED']  
         self.unchecked_task_names = [task['title'] for task in self.unchecked_tasks]
         self.unchecked_task_count = len(self.unchecked_tasks)
+
+    def tasks_message(self):
+        message = "You have {} unchecked tasks".format(self.unchecked_task_count)
+        print(message)
+        tts(message)

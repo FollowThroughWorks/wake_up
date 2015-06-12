@@ -1,5 +1,6 @@
 import oauth.google_oauth2 as google_oauth2 # oauth
 from apiclient.discovery import build
+from utilities import text_to_speech as tts # For text to speech
 
 from httplib2 import Http
 
@@ -28,3 +29,8 @@ class gmail:
             unread += len(emails['messages'])
 
         return unread
+
+    def unread_emails_message(self):
+        message = "You have {} unread emails".format(self.unread_emails())
+        print(message)
+        tts(message)

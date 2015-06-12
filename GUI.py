@@ -328,7 +328,7 @@ class ButtonsFrame(ttk.Frame):
         save_settings_button = ttk.Button(self,text="Save Settings",command=lambda: save_settings(self.parent.options))
         save_settings_button.grid(column=1,row=1,sticky='NSEW',padx=30)
 
-        run_button = ttk.Button(self,text="Wake Up!",command=lambda: run_wake(self.parent.options))
+        run_button = ttk.Button(self,text="Schedule",command=lambda: run_wake(self.parent.options))
         run_button.grid(column=2,row=1,sticky='NSEW',padx=30)
 
         cancel_button = ttk.Button(self,text="Cancel",command=lambda: parent.parent.destroy())
@@ -383,5 +383,6 @@ class MainApplication(tk.Frame):
         
 if __name__ == "__main__":
     root = tk.Tk()
+    root.title("Wake Up!")
     MainApplication(root).pack(side="top",fill="both",expand=True)
     root.mainloop()

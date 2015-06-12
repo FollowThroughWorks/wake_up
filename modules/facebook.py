@@ -1,6 +1,7 @@
 import oauth.facebook_oauth2  as facebook_oauth2 
 import requests
 import json
+from utilities import text_to_speech as tts # For text to speech
 
 token = facebook_oauth2.get_token()
 
@@ -16,3 +17,8 @@ class notifications:
             self.unseen_count = self.response_json['summary']['unseen_count']
         except KeyError:
             self.unseen_count = 0
+
+    def notifications_message(self):
+        message = "You have {} unseen notifications, and {} unread notifications".format(self.unseen_count,self.unread_count)
+        print(message)
+        tts(message)

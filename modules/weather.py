@@ -1,10 +1,10 @@
 import pywapi # For retrieving weather info
-from utilities # For text to speech
+from utilities import text_to_speech as tts # For text to speech
 
 # Weather information
 class forecast:
     def __init__(self,zip_in):
-        zip_code = zip_in
+        zip_code = str(zip_in)
 
         print("Retrieving weather info...")
         weather = pywapi.get_weather_from_weather_com(zip_code,units='imperial')
@@ -23,12 +23,15 @@ class forecast:
 
     def temp_message(self):
         message = "Today's temperature will range from {} to {} degrees".format(self.temp_low,self.temp_high)
+        print(message)
         tts(message)
 
     def precipitation_message(self):
         message = "Chance of precipitation in the day is {}% and at night is {}%".format(self.day_precip,self.night_precip)
+        print(message)
         tts(message)
 
     def sunset_message(self):
-        message = "Sunset is at {}".format(self.sunset)
+        message = "The sun will set at {}".format(self.sunset)
+        print(message)
         tts(message)

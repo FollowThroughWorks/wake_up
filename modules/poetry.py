@@ -4,6 +4,8 @@ from bs4 import BeautifulSoup, NavigableString # For navigating html
 from io import BytesIO # to convert mp3 url to io object
 from pydub import playback, AudioSegment # to read poem
 
+from utilities import text_to_speech as tts # For text to speech
+
 # Poem of the day from Poets.org
 class potd_poets_org:
     def __init__(self):
@@ -16,7 +18,16 @@ class potd_poets_org:
             self.title = soup.find(id="poem-content").h1.get_text()
             self.author = soup.find(id="poem-content").h2.get_text().split(',')[0]
             poem_html = soup.find(id="poem-content").find("p").contents
-            self.lines = [item for item in poem_html if isinstance(item,NavigableString)]          
+            self.lines = [item for item in poem_html if isinstance(item,NavigableString)]
+
+    def read_poem_tts(self):
+        message = "The poets.org poem of the day is {} by {}: {}".format(self.title,self.author,[line for line in self.lines])
+        tts(message)
+
+    def display_poem(self):
+        message = "The poets.org poem of the day is {} by {}: {}".format(self.title,self.author,[line for line in self.lines])
+        print(message)
+
 
 # Poem of the day from the poetry foundation
 class potd_poetry_foundation:
@@ -47,12 +58,20 @@ class potd_poetry_foundation:
             except AttributeError:
                 self.lines = ["This poem text is not available."]
 
+    def read_poem_tts(self):
+        message = "The poetry foundation poem of the day is {} by {}: {}".format(self.title,self.author,[line for line in self.lines])
+        tts(message)
 
-
-    def read_poem(self):
+    def read_poem_site(self):
+        message = "The poetry foundation poem of the day is {} by {}".format(self.title,self.author)
+        tts(message)
         mp3 = request.urlopen(self.audio_url).read()
         poem = AudioSegment.from_mp3(BytesIO(mp3))
         playback.play(poem)
+
+    def display_poem(self):
+        message = "The poetry foundation poem of the day is {} by {}: {}".format(self.title,self.author,[line for line in self.lines])
+        print(message)
 
 if __name__ == '__main__':
     print(potd_poets_org().lines)
