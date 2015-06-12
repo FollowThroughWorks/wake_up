@@ -34,10 +34,10 @@ def load_settings(options_frame):
     options_frame.poetry.check_state.set(settings['poetry']['check_state'])
     options_frame.poetry.pf_text.set(settings['poetry']['poetry_pf']['text'])
     options_frame.poetry.pf_audio_type.set(settings['poetry']['poetry_pf']['audio'])
-    options_frame.poetry.check_state.set(settings['poetry']['poetry_pf']['check_state'])
+    options_frame.poetry.poetry_foundation.check_state.set(settings['poetry']['poetry_pf']['check_state'])
     options_frame.poetry.po_text.set(settings['poetry']['poetry_po']['text'])
     options_frame.poetry.po_audio_type.set(settings['poetry']['poetry_po']['audio'])
-    options_frame.poetry.check_state.set(settings['poetry']['poetry_po']['check_state'])
+    options_frame.poetry.poets_org.check_state.set(settings['poetry']['poetry_po']['check_state'])
 
     options_frame.social_media.check_state.set(settings['social media']['check_state'])    
     options_frame.social_media.facebook.set(settings['social media']['facebook'])
