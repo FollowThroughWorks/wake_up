@@ -45,11 +45,21 @@ def update_label(to_display,label):
 def file_choice(parent_frame):
     parent_frame.filename.set(askopenfilename())
 
+def alert_window(message):
+    alert = tk.Toplevel()
+
+    text = ttk.Label(alert,text=message)
+    text.grid(column=1,row=1)
+
+    button = ttk.Button(alert, text="Okay", command=alert.destroy)
+    button.grid(column=1,row=2)
+    
 ###### CLASSES TO INHERIT FROM ########
     
 class ChoiceAndSubchoicesFrame(tk.Frame):
     def __init__(self,parent,option_name):
         tk.Frame.__init__(self,parent)
+        self.parent = parent
         self.config(borderwidth=1,relief='ridge',padx=5,pady=5)
 
         # Checkbox to turn on or off
@@ -76,6 +86,7 @@ class ChoiceAndSubchoicesFrame(tk.Frame):
 class SubSubchoicesFrame(ChoiceAndSubchoicesFrame):
     def __init__(self,parent,option_name):
         ChoiceAndSubchoicesFrame.__init__(self,parent,option_name)
+        self.parent = parent
         self.on_off_check.configure(style='SubSubchoices.TCheckbutton')
         self.config(relief='sunken')
         
@@ -86,14 +97,39 @@ class SubSubchoicesFrame(ChoiceAndSubchoicesFrame):
 class TimeFrame(ttk.Frame):
     def __init__(self,parent):
         ttk.Frame.__init__(self,parent)
+        self.parent = parent
+
+        vcmd = self.register(self.validate_time)  
 
         time_label = ttk.Label(self,text="Wake Time:")
         time_label.grid(column=1,row=1)
 
         self.wake_time = tk.StringVar(value="07:00:00")
-        time_entry = ttk.Entry(self,textvariable=self.wake_time)
+        time_entry = ttk.Entry(self,textvariable=self.wake_time,validate='focusout',
+                               validatecommand=(vcmd,'%P'))
         time_entry.grid(column=2,row=1)
-        
+
+    def validate_time(self,new_text):
+        # If there is text
+        if new_text:
+            try:
+                hour = new_text.split(':')[0]
+                minute = new_text.split(':')[1]
+                assert len(minute) == 2
+                assert int(minute) < 61
+                assert len(hour) > 0 and len(hour) < 3
+                assert int(hour) < 13
+                self.parent.parent.buttons.run_button.state(['!disabled'])
+            except (IndexError,AssertionError):
+                alert_window("Please insert a time between 00:00 and 23:99")
+                self.parent.parent.buttons.run_button.state(['disabled'])
+        # If there is no text
+        else:
+            alert_window("Please insert a time between 00:00 and 23:99")
+            self.parent.parent.buttons.run_button.state(['disabled'])
+
+        return True
+
 class AlarmFrame(ChoiceAndSubchoicesFrame):
     def __init__(self,parent):
         ChoiceAndSubchoicesFrame.__init__(self,parent,"Alarm")
@@ -328,8 +364,8 @@ class ButtonsFrame(ttk.Frame):
         save_settings_button = ttk.Button(self,text="Save Settings",command=lambda: save_settings(self.parent.options))
         save_settings_button.grid(column=1,row=1,sticky='NSEW',padx=30)
 
-        run_button = ttk.Button(self,text="Schedule",command=lambda: run_wake(self.parent.options))
-        run_button.grid(column=2,row=1,sticky='NSEW',padx=30)
+        self.run_button = ttk.Button(self,text="Schedule",command=lambda: run_wake(self.parent.options))
+        self.run_button.grid(column=2,row=1,sticky='NSEW',padx=30)
 
         cancel_button = ttk.Button(self,text="Cancel",command=lambda: parent.parent.destroy())
         cancel_button.grid(column=3,row=1,sticky='NSEW',padx=30)
@@ -361,8 +397,8 @@ class MainApplication(tk.Frame):
         self.display.grid(column=2,row=1,padx=5,pady=5,sticky='NSEW')
 '''
             
-        buttons = ButtonsFrame(self)
-        buttons.grid(column=1,row=2,sticky='NSEW',columnspan=2,pady=5)
+        self.buttons = ButtonsFrame(self)
+        self.buttons.grid(column=1,row=2,sticky='NSEW',columnspan=2,pady=5)
 
         self.columnconfigure(1,weight=1)
         self.columnconfigure(2,weight=1)
