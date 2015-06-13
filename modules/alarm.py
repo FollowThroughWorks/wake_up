@@ -9,9 +9,9 @@ class sound():
         self.length = len(self.audio)/1000
     
     def play(self,duration_secs):
-        audio = self.audio[:(duration_secs*1000)]
-        audio_duration = len(audio)
-        playback.play(audio)
+        self.audio = self.audio[:(duration_secs*1000)]
+        audio_duration = len(self.audio)
+        playback.play(self.audio)
         #time.sleep(song_duration/1000)
 
 if __name__ == '__main__':

@@ -3,7 +3,7 @@ from tkinter import ttk
 from tkinter.filedialog import askopenfilename
 
 from utilities import load_settings, save_settings # For saving and loading preferences
-from wake import run_wake_from_gui # For scheduling waking when Wake Up! is pressed
+import wake # For scheduling waking when Wake Up! is pressed
 import modules.alarm
 
 ###### METHODS #########
@@ -55,6 +55,8 @@ def alert_window(message):
     button = ttk.Button(alert, text="Okay", command=alert.destroy)
     button.grid(column=1,row=2)
 
+    alert.columnconfigure(1,weight=1)
+
 def choose_alarm(alarm_frame):
     file_choice(alarm_frame)
     if not '.mp3' in alarm_frame.filename.get():
@@ -63,6 +65,8 @@ def choose_alarm(alarm_frame):
     else:
         file_length = modules.alarm.sound(alarm_frame.filename.get()).length
         alarm_frame.alarm_length_scale.configure(to=file_length)
+        if alarm_frame.duration.get() > file_length: alarm_frame.duration.set(file_length)
+        update_label("Duration: {}".format(alarm_frame.duration.get()),alarm_frame.length_label)
     
 ###### CLASSES TO INHERIT FROM ########
     
@@ -113,13 +117,19 @@ class TimeFrame(ttk.Frame):
 
         vcmd = self.register(self.validate_time)  
 
-        time_label = ttk.Label(self,text="Wake Time:")
+        time_label = ttk.Label(self,text="Wake Time:",style="TimeFrame.TLabel")
         time_label.grid(column=1,row=1)
 
-        self.wake_time = tk.StringVar(value="07:00:00")
+        self.wake_time = tk.StringVar(value="07:00")
         time_entry = ttk.Entry(self,textvariable=self.wake_time,validate='focusout',
-                               validatecommand=(vcmd,'%P'))
+                               validatecommand=(vcmd,'%P'),style="TimeLabel.TEntry")
         time_entry.grid(column=2,row=1)
+
+        self.am_pm = tk.StringVar()
+        am = ttk.Radiobutton(self,text="AM",variable=self.am_pm,value="am",command=lambda: print(self.am_pm.get()))
+        pm = ttk.Radiobutton(self,text="PM",variable=self.am_pm,value="pm",command=lambda: print(self.am_pm.get()))
+        am.grid(column=3,row=1)
+        pm.grid(column=4,row=1)
 
     def validate_time(self,new_text):
         # If there is text
@@ -130,19 +140,18 @@ class TimeFrame(ttk.Frame):
                 assert len(minute) == 2
                 assert int(minute) < 61
                 assert len(hour) > 0 and len(hour) < 3
-                assert int(hour) < 25
+                assert int(hour) < 13
                 if len(hour) == 1:
-                    print("HOUR")
                     hour = "0{}".format(hour)
-                self.wake_time.set('{}:{}:00'.format(hour,minute))
-                self.parent.parent.buttons.run_button.state(['!disabled'])
+                self.wake_time.set('{}:{}'.format(hour,minute))
+                self.parent.parent.buttons.schedule_button.state(['!disabled'])
             except (IndexError,AssertionError):
-                alert_window("Please insert a time between 00:00 and 23:99")
-                self.parent.parent.buttons.run_button.state(['disabled'])
+                alert_window("Invalid time")
+                self.parent.parent.buttons.schedule_button.state(['disabled'])
         # If there is no text
         else:
-            alert_window("Please insert a time between 00:00 and 23:99")
-            self.parent.parent.buttons.run_button.state(['disabled'])
+            alert_window("Invalid time")
+            self.parent.parent.buttons.schedule_button.state(['disabled'])
 
         return True
 
@@ -151,7 +160,7 @@ class AlarmFrame(ChoiceAndSubchoicesFrame):
         ChoiceAndSubchoicesFrame.__init__(self,parent,"Alarm")
         
         # Filename field
-        self.filename = tk.StringVar(value="None")
+        self.filename = tk.StringVar(value="modules/bugle.mp3")
         entry_one = ttk.Entry(self,textvariable=self.filename)
         entry_one.grid(column=1,row=1)
 
@@ -416,15 +425,23 @@ class ButtonsFrame(ttk.Frame):
         save_settings_button = ttk.Button(self,text="Save Settings",command=lambda: save_settings(self.parent.options))
         save_settings_button.grid(column=1,row=1,sticky='NSEW',padx=30)
 
-        self.run_button = ttk.Button(self,text="Schedule",command=lambda: run_wake_from_gui(self.parent.options))
-        self.run_button.grid(column=2,row=1,sticky='NSEW',padx=30)
+        self.run_button = ttk.Button(self,text="Run Now", command = lambda: wake.run_wake_from_gui(self.parent.options))
+        self.run_button.grid(column=2,row=1)
+        
+        self.schedule_button = ttk.Button(self,text="Schedule",command= self.on_schedule)
+        self.schedule_button.grid(column=3,row=1,sticky='NSEW',padx=30)
 
         close_button = ttk.Button(self,text="Close",command=lambda: parent.parent.destroy())
-        close_button.grid(column=3,row=1,sticky='NSEW',padx=30)
+        close_button.grid(column=4,row=1,sticky='NSEW',padx=30)
 
         self.columnconfigure(1,weight=1)
         self.columnconfigure(2,weight=1)
         self.columnconfigure(3,weight=1)
+        self.columnconfigure(4,weight=1)
+
+    def on_schedule(self):
+        alert_window("Wake Up! set for {}".format(self.parent.options.time.wake_time.get()))
+        self.parent.scheduler.schedule(self.parent.options.time.wake_time.get(),self.parent.options.time.am_pm.get(),lambda: wake.run_wake_from_gui(self.parent.options))
         
 # The main window   
 class MainApplication(tk.Frame):
@@ -435,10 +452,13 @@ class MainApplication(tk.Frame):
         # Fonts & Styles
         choiceandsubchoice_font = tk.font.Font(size=10,weight='bold')
         subsubchoice_font = tk.font.Font(size=8,weight='bold')
+        timelabel_font = tk.font.Font(size=12,weight='bold')
        
         s = ttk.Style()
         s.configure('SubSubchoices.TCheckbutton',font=subsubchoice_font)
         s.configure('ChoiceAndSubchoices.TCheckbutton',font=choiceandsubchoice_font)
+        s.configure('TimeFrame.TLabel',font=timelabel_font)
+        s.configure('TimeFrame.TEntry',font=timelabel_font)
 
         # Frames
         self.options = OptionsFrame(self)
@@ -468,6 +488,9 @@ class MainApplication(tk.Frame):
 
         # Updates the alarm duration label on first load
         update_label("Duration: {}".format(self.options.alarm.duration.get()),self.options.alarm.length_label)
+
+        # Creates scheduler object
+        self.scheduler = wake.scheduler()
         
 if __name__ == "__main__":
     root = tk.Tk()

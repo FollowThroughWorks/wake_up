@@ -10,22 +10,33 @@ import modules.facebook
 import modules.anydo_
 
 # Schedule a function to occur at the same time every day
-def schedule(alarm_time,scheduled_function):
-    alarm_hour = int(alarm_time.split(':')[0])
-    alarm_minute = int(alarm_time.split(':')[1])
-    alarm_second = int(alarm_time.split(':')[2])
+class scheduler():
+    def __init__(self):
+        pass
+    
+    def schedule(self,alarm_time,am_or_pm,scheduled_function):
+        try:
+            if self.t:
+                self.t.cancel()
+                self.t2.cancel()
+        except:
+            print("No timer exists")
+            
+        alarm_hour = int(alarm_time.split(':')[0])
+        alarm_minute = int(alarm_time.split(':')[1])
+        if am_or_pm == "pm": alarm_hour += 12
 
-    time_now = datetime.today()
-    run_time = time_now.replace(day = (time_now.day)+1, hour=alarm_hour, minute=alarm_minute, second=alarm_second, microsecond=0)
-    delta_t = run_time-time_now
+        time_now = datetime.today()
+        run_time = time_now.replace(day = (time_now.day)+1, hour=alarm_hour, minute=alarm_minute, second=0, microsecond=0)
+        delta_t = run_time-time_now
 
-    secs = delta_t.seconds+1
+        secs = delta_t.seconds+1
 
-    print("Scheduling wakeup for {}".format(alarm_time))
-    t = Timer(secs,scheduled_function)
-    t.start()
-    t2 = Timer(secs,lambda: schedule(alarm_time,scheduled_function))
-    t2.start()
+        print("Scheduling wakeup for {}".format(run_time))
+        self.t = Timer(secs,scheduled_function)
+        self.t.start()
+        self.t2 = Timer(secs,lambda: self.schedule(alarm_time,am_or_pm,scheduled_function))
+        self.t2.start()
 
 def run_functions(function_queue):             
     for function_args_pair in function_queue:
@@ -122,5 +133,4 @@ def run_wake_from_gui(options_frame):
     poem_pf = options_frame.poetry.poetry_foundation.check_state.get()
     social_media = options_frame.social_media.check_state.get()
     '''
-    wake_function = lambda: run_functions(function_queue)
-    schedule(wake_time,wake_function)
+    run_functions(function_queue)
