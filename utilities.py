@@ -17,6 +17,7 @@ def load_settings(options_frame):
 
         options_frame.time.wake_time.set(settings['time']['wake time'])
         options_frame.time.am_pm.set(settings['time']['am_pm'])
+        options_frame.time.name.set(settings['time']['name'])
         
         options_frame.alarm.check_state.set(settings['alarm']['check_state'])
         options_frame.alarm.filename.set(settings['alarm']['file'])
@@ -58,7 +59,8 @@ def save_settings(options_frame):
     settings = {
 	"time": {
                 "wake time":options_frame.time.wake_time.get(),
-                "am_pm":options_frame.time.am_pm.get()
+                "am_pm":options_frame.time.am_pm.get(),
+                "name":options_frame.time.name.get()
         },
 	"alarm": {
                 "check_state": options_frame.alarm.check_state.get(),

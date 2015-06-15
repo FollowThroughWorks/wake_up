@@ -115,6 +115,14 @@ class TimeFrame(ttk.Frame):
         ttk.Frame.__init__(self,parent)
         self.parent = parent
 
+        # Name
+        name_label= ttk.Label(self,text="Name:")
+        name_label.grid(column=1,row=2,sticky='E')
+        self.name = tk.StringVar()
+        name_entry = ttk.Entry(self,textvariable=self.name)
+        name_entry.grid(column=2,row=2,pady=5)
+
+        # Time
         vcmd = self.register(self.validate_time)  
 
         time_label = ttk.Label(self,text="Wake Time:",style="TimeFrame.TLabel")
@@ -123,7 +131,7 @@ class TimeFrame(ttk.Frame):
         self.wake_time = tk.StringVar(value="07:00")
         time_entry = ttk.Entry(self,textvariable=self.wake_time,validate='focusout',
                                validatecommand=(vcmd,'%P'),style="TimeLabel.TEntry")
-        time_entry.grid(column=2,row=1)
+        time_entry.grid(column=2,row=1,padx=5)
 
         self.am_pm = tk.StringVar()
         am = ttk.Radiobutton(self,text="AM",variable=self.am_pm,value="am",command=lambda: print(self.am_pm.get()))

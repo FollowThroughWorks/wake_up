@@ -9,6 +9,8 @@ import modules.poetry
 import modules.facebook
 import modules.anydo_
 
+from utilities import text_to_speech
+
 # Schedule a function to occur at the same time every day
 class scheduler():
     def __init__(self):
@@ -48,6 +50,9 @@ def run_wake_from_gui(options_frame):
     # List of [function,(args)] to call at scheduled time
     function_queue = []
 
+    # Greeting
+    function_queue.append([lambda: text_to_speech("Good morning {}".format(options_frame.time.name.get())),()])
+    
     # Alarm
     if options_frame.alarm.check_state.get() == 1:
         sound = modules.alarm.sound(options_frame.alarm.filename.get())
@@ -123,14 +128,5 @@ def run_wake_from_gui(options_frame):
             function_queue.append([ad.tasks_message,()])
  
     wake_time = options_frame.time.wake_time.get()
-    '''
-    greeting = True
-    music = options_frame.alarm.check_state.get()
-    weather = options_frame.weather.check_state.get()
-    events = options_frame.events.check_state.get()
-    emails = options_frame.emails.check_state.get()
-    poem_po = options_frame.poetry.poets_org.check_state.get()
-    poem_pf = options_frame.poetry.poetry_foundation.check_state.get()
-    social_media = options_frame.social_media.check_state.get()
-    '''
+
     run_functions(function_queue)
