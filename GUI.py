@@ -5,6 +5,7 @@ from tkinter.filedialog import askopenfilename
 from utilities import load_settings, save_settings # For saving and loading preferences
 import wake # For scheduling waking when Wake Up! is pressed
 import modules.alarm
+import datetime
 
 ###### METHODS #########
 def toggle_subchoices(parent_frame):
@@ -423,7 +424,27 @@ class DisplayFrame(ttk.Frame):
         ttk.Frame.__init__(self,parent)
         self.parent = parent
 
-        self.config(width=100,height=100,borderwidth=5,relief='sunken',padding='.5i')
+        self.config(borderwidth=5,relief='sunken')
+
+        text_label = ttk.Label(self,text="Alarm will go off in:")
+        text_label.grid(column=1,row=1,sticky='E')
+
+        self.timer = ttk.Label(self,text="00:00:00")
+        self.timer.grid(column=2,row=1,sticky='W')
+
+        self.columnconfigure(1,weight=1)
+        self.columnconfigure(2,weight=1)
+
+    def update_timer(self,alarm_time):
+        now = datetime.datetime.now()
+        countdown = alarm_time - now
+        countdown_hours = int(countdown.seconds / 3600)
+        countdown_minutes = int(countdown.seconds / 60 % 60)
+        countdown_seconds = int(countdown.seconds % 60)
+        timer = "{}:{}:{}".format(countdown_hours,countdown_minutes,countdown_seconds)
+        
+        self.timer.configure(text=timer)
+        self.after(1000,lambda: self.update_timer(alarm_time))
 
 class ButtonsFrame(ttk.Frame):
     def __init__(self,parent):
@@ -448,8 +469,10 @@ class ButtonsFrame(ttk.Frame):
         self.columnconfigure(4,weight=1)
 
     def on_schedule(self):
-        alert_window("Wake Up! set for {}".format(self.parent.options.time.wake_time.get()))
         self.parent.scheduler.schedule(self.parent.options.time.wake_time.get(),self.parent.options.time.am_pm.get(),lambda: wake.run_wake_from_gui(self.parent.options))
+        # Update display
+        alarm_time = self.parent.scheduler.run_time
+        self.parent.display.update_timer(alarm_time)
         
 # The main window   
 class MainApplication(tk.Frame):
@@ -471,14 +494,12 @@ class MainApplication(tk.Frame):
         # Frames
         self.options = OptionsFrame(self)
         self.options.grid(column=1,row=1,padx=5,pady=5,sticky='NSEW')
-        
-        '''
-        self.display = DisplayFrame(self)
-        self.display.grid(column=2,row=1,padx=5,pady=5,sticky='NSEW')
-'''
-            
+   
         self.buttons = ButtonsFrame(self)
         self.buttons.grid(column=1,row=2,sticky='NSEW',columnspan=2,pady=5)
+
+        self.display = DisplayFrame(self)
+        self.display.grid(column=1,row=3,padx=5,pady=5,sticky='NSEW')
 
         self.columnconfigure(1,weight=1)
         self.columnconfigure(2,weight=1)

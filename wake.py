@@ -29,12 +29,12 @@ class scheduler():
         if am_or_pm == "pm": alarm_hour += 12
 
         time_now = datetime.today()
-        run_time = time_now.replace(day = (time_now.day)+1, hour=alarm_hour, minute=alarm_minute, second=0, microsecond=0)
-        delta_t = run_time-time_now
+        self.run_time = time_now.replace(day = (time_now.day)+1, hour=alarm_hour, minute=alarm_minute, second=0, microsecond=0)
+        delta_t = self.run_time-time_now
 
         secs = delta_t.seconds+1
 
-        print("Scheduling wakeup for {}".format(run_time))
+        print("Scheduling wakeup for {}".format(self.run_time))
         self.t = Timer(secs,scheduled_function)
         self.t.start()
         self.t2 = Timer(secs,lambda: self.schedule(alarm_time,am_or_pm,scheduled_function))
