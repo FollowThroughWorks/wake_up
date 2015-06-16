@@ -26,11 +26,13 @@ class scheduler():
             
         alarm_hour = int(alarm_time.split(':')[0])
         alarm_minute = int(alarm_time.split(':')[1])
+        if alarm_hour == 12: alarm_hour = 0
         if am_or_pm == "pm": alarm_hour += 12
 
         time_now = datetime.today()
         self.run_time = time_now.replace(day = (time_now.day)+1, hour=alarm_hour, minute=alarm_minute, second=0, microsecond=0)
         delta_t = self.run_time-time_now
+        print(self.run_time)
 
         secs = delta_t.seconds+1
 
