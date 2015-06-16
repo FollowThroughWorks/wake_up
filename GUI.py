@@ -4,8 +4,9 @@ from tkinter.filedialog import askopenfilename
 
 from utilities import load_settings, save_settings # For saving and loading preferences
 import wake # For scheduling waking when Wake Up! is pressed
-import modules.alarm
-import datetime
+import modules.alarm # For adjusting scale size
+
+import datetime #  For timer
 
 ###### METHODS #########
 def toggle_subchoices(parent_frame):
@@ -470,6 +471,7 @@ class ButtonsFrame(ttk.Frame):
 
     def on_schedule(self):
         self.parent.scheduler.schedule(self.parent.options.time.wake_time.get(),self.parent.options.time.am_pm.get(),lambda: wake.run_wake_from_gui(self.parent.options))
+
         # Update display
         alarm_time = self.parent.scheduler.run_time
         self.parent.display.update_timer(alarm_time)

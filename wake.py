@@ -50,15 +50,15 @@ def run_wake_from_gui(options_frame):
     # List of [function,(args)] to call at scheduled time
     function_queue = []
 
-    # Greeting
-    function_queue.append([lambda: text_to_speech("Good morning {}".format(options_frame.time.name.get())),()])
-    
     # Alarm
     if options_frame.alarm.check_state.get() == 1:
         sound = modules.alarm.sound(options_frame.alarm.filename.get())
         alarm_args = (options_frame.alarm.duration.get(),)
         function_queue.append([sound.play,alarm_args])
 
+    # Greeting
+    function_queue.append([lambda: text_to_speech("Good morning {}".format(options_frame.time.name.get())),()])
+    
     # Weather
     if options_frame.weather.check_state.get() == 1:
         forecast = modules.weather.forecast(options_frame.weather.zip.get())
