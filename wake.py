@@ -40,6 +40,10 @@ class scheduler():
         self.t2 = Timer(secs,lambda: self.schedule(alarm_time,am_or_pm,scheduled_function))
         self.t2.start()
 
+    def cancel(self):
+        self.t.cancel()
+        self.t2.cancel()
+
 def run_functions(function_queue):             
     for function_args_pair in function_queue:
         function_args_pair[0](*function_args_pair[1])

@@ -436,16 +436,21 @@ class DisplayFrame(ttk.Frame):
         self.columnconfigure(1,weight=1)
         self.columnconfigure(2,weight=1)
 
+        self.cancel_clicked = False
+
     def update_timer(self,alarm_time):
-        now = datetime.datetime.now()
-        countdown = alarm_time - now
-        countdown_hours = int(countdown.seconds / 3600)
-        countdown_minutes = int(countdown.seconds / 60 % 60)
-        countdown_seconds = int(countdown.seconds % 60)
-        timer = "{}:{}:{}".format(countdown_hours,countdown_minutes,countdown_seconds)
-        
-        self.timer.configure(text=timer)
-        self.after(1000,lambda: self.update_timer(alarm_time))
+        if self.cancel_clicked == False:
+            now = datetime.datetime.now()
+            countdown = alarm_time - now
+            countdown_hours = int(countdown.seconds / 3600)
+            countdown_minutes = int(countdown.seconds / 60 % 60)
+            countdown_seconds = int(countdown.seconds % 60)
+            timer = "{}:{}:{}".format(countdown_hours,countdown_minutes,countdown_seconds)
+            
+            self.timer.configure(text=timer)
+            self.after(1000,lambda: self.update_timer(alarm_time))
+        else:
+            print("Cancelled!")
 
 class ButtonsFrame(ttk.Frame):
     def __init__(self,parent):
@@ -461,6 +466,8 @@ class ButtonsFrame(ttk.Frame):
         self.schedule_button = ttk.Button(self,text="Schedule",command= self.on_schedule)
         self.schedule_button.grid(column=3,row=1,sticky='NSEW',padx=30)
 
+        self.cancel_button = ttk.Button(self,text="Cancel",command= self.cancel)
+
         close_button = ttk.Button(self,text="Close",command=lambda: parent.parent.destroy())
         close_button.grid(column=4,row=1,sticky='NSEW',padx=30)
 
@@ -470,11 +477,23 @@ class ButtonsFrame(ttk.Frame):
         self.columnconfigure(4,weight=1)
 
     def on_schedule(self):
+        self.parent.display.cancel_clicked = False
         self.parent.scheduler.schedule(self.parent.options.time.wake_time.get(),self.parent.options.time.am_pm.get(),lambda: wake.run_wake_from_gui(self.parent.options))
 
         # Update display
         alarm_time = self.parent.scheduler.run_time
         self.parent.display.update_timer(alarm_time)
+
+        self.parent.buttons.schedule_button.grid_forget()
+        self.parent.buttons.cancel_button.grid(column=3,row=1,sticky='NSEW',padx=30)
+
+    def cancel(self):
+        self.parent.scheduler.cancel()
+        self.parent.display.cancel_clicked = True
+        self.parent.display.timer.configure(text="00:00:00")
+
+        self.parent.buttons.cancel_button.grid_forget()
+        self.parent.buttons.schedule_button.grid(column=3,row=1,sticky='NSEW',padx=30)
         
 # The main window   
 class MainApplication(tk.Frame):
