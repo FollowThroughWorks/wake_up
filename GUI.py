@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, font
 from tkinter.filedialog import askopenfilename
 
 from utilities import load_settings, save_settings # For saving and loading preferences
@@ -7,6 +7,7 @@ import wake # For scheduling waking when Wake Up! is pressed
 import modules.alarm # For adjusting scale size
 
 import datetime #  For timer
+import threading # For timer
 
 ###### METHODS #########
 def toggle_subchoices(parent_frame):
@@ -438,6 +439,7 @@ class DisplayFrame(ttk.Frame):
 
         self.cancel_clicked = False
 
+
     def update_timer(self,alarm_time):
         if self.cancel_clicked == False:
             now = datetime.datetime.now()
@@ -482,7 +484,10 @@ class ButtonsFrame(ttk.Frame):
 
         # Update display
         alarm_time = self.parent.scheduler.run_time
-        self.parent.display.update_timer(alarm_time)
+
+        t = threading.Thread(target=self.parent.display.update_timer,args=(alarm_time,))
+        t.start()
+
 
         self.parent.buttons.schedule_button.grid_forget()
         self.parent.buttons.cancel_button.grid(column=3,row=1,sticky='NSEW',padx=30)
