@@ -428,31 +428,52 @@ class DisplayFrame(ttk.Frame):
 
         self.config(borderwidth=5,relief='sunken')
 
-        text_label = ttk.Label(self,text="Alarm will go off in:")
-        text_label.grid(column=1,row=1,sticky='E')
+        current_time_label = ttk.Label(self,text="Current Time:")
+        current_time_label.grid(column=1,row=1,sticky='E')
 
-        self.timer = ttk.Label(self,text="00:00:00")
-        self.timer.grid(column=2,row=1,sticky='W')
+        self.current_timer = ttk.Label(self,text="00:00:00")
+        self.current_timer.grid(column=2,row=1,sticky='W')
+        
+        alarm_time_label = ttk.Label(self,text="Alarm Time:")
+        alarm_time_label.grid(column=3,row=1,sticky='E')
+        
+        self.alarm_timer = ttk.Label(self,text="00:00:00")
+        self.alarm_timer.grid(column=4,row=1,sticky='W')
+
+        time_left_label = ttk.Label(self,text="Time Left:")
+        time_left_label.grid(column=5,row=1,sticky='E')
+
+        self.time_left_timer = ttk.Label(self,text="00:00:00")
+        self.time_left_timer.grid(column=6,row=1,sticky='W')
 
         self.columnconfigure(1,weight=1)
         self.columnconfigure(2,weight=1)
+        self.columnconfigure(3,weight=1)
+        self.columnconfigure(4,weight=1)
+        self.columnconfigure(5,weight=1)
+        self.columnconfigure(6,weight=1)
 
         self.cancel_clicked = False
 
 
-    def update_timer(self,alarm_time):
-        if self.cancel_clicked == False:
-            now = datetime.datetime.now()
-            countdown = alarm_time - now
-            countdown_hours = int(countdown.seconds / 3600)
-            countdown_minutes = int(countdown.seconds / 60 % 60)
-            countdown_seconds = int(countdown.seconds % 60)
-            timer = "{}:{}:{}".format(countdown_hours,countdown_minutes,countdown_seconds)
-            
-            self.timer.configure(text=timer)
-            self.after(1000,lambda: self.update_timer(alarm_time))
+    def update_timers(self):
+        if self.cancel_clicked:
+            pass
+
         else:
-            print("Cancelled!")
+            now = datetime.datetime.now()
+            self.current_timer.configure(text="{}:{}:{}".format(str(now.hour).rjust(2,'0'),str(now.minute).rjust(2,'0'),str(now.second).rjust(2,'0')))
+    
+            self.alarm_timer.configure(text="{}:{}:{}".format(str(self.parent.scheduler.run_time.hour).rjust(2,'0'),
+                                            str(self.parent.scheduler.run_time.minute).rjust(2,'0'),
+                                            str(self.parent.scheduler.run_time.second).rjust(2,'0')))
+
+            self.time_left_timer.configure(text="{}:{}:{}".format(str(self.parent.scheduler.countdown_hours).rjust(2,'0'),
+                                                                  str(self.parent.scheduler.countdown_minutes).rjust(2,'0'),
+                                                                  str(self.parent.scheduler.countdown_seconds).rjust(2,'0')))
+
+            self.parent.scheduler.tick()
+            self.after(1000,self.update_timers)
 
 class ButtonsFrame(ttk.Frame):
     def __init__(self,parent):
@@ -484,18 +505,17 @@ class ButtonsFrame(ttk.Frame):
 
         # Update display
         alarm_time = self.parent.scheduler.run_time
+        print("ALARM TIME: {}".format(alarm_time))
 
-        t = threading.Thread(target=self.parent.display.update_timer,args=(alarm_time,))
-        t.start()
-
-
+        self.parent.display.update_timers()
+        
         self.parent.buttons.schedule_button.grid_forget()
         self.parent.buttons.cancel_button.grid(column=3,row=1,sticky='NSEW',padx=30)
 
     def cancel(self):
         self.parent.scheduler.cancel()
         self.parent.display.cancel_clicked = True
-        self.parent.display.timer.configure(text="00:00:00")
+        self.parent.display.time_left_timer.configure(text="00:00:00")
 
         self.parent.buttons.cancel_button.grid_forget()
         self.parent.buttons.schedule_button.grid(column=3,row=1,sticky='NSEW',padx=30)

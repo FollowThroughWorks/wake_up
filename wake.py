@@ -1,5 +1,5 @@
-from datetime import datetime # For scheduling the alarm
-from threading import Timer # For scheduling the alarm
+from datetime import datetime, timedelta # For scheduling the alarm
+import threading # For scheduling the alarm
 
 import modules.alarm # For calling the functions to do things
 import modules.weather
@@ -17,34 +17,38 @@ class scheduler():
         pass
     
     def schedule(self,alarm_time,am_or_pm,scheduled_function):
-        try:
-            if self.t:
-                self.t.cancel()
-                self.t2.cancel()
-        except:
-            print("No timer exists")
-            
+        self.scheduled_function = scheduled_function
+        self.alarm_time = alarm_time
+        self.am_or_pm = am_or_pm
+        
         alarm_hour = int(alarm_time.split(':')[0])
         alarm_minute = int(alarm_time.split(':')[1])
         if alarm_hour == 12: alarm_hour = 0
         if am_or_pm == "pm": alarm_hour += 12
 
         time_now = datetime.today()
-        self.run_time = time_now.replace(day = (time_now.day)+1, hour=alarm_hour, minute=alarm_minute, second=0, microsecond=0)
-        delta_t = self.run_time-time_now
-        print(self.run_time)
+        self.run_time = time_now.replace(day = time_now.day, hour=alarm_hour, minute=alarm_minute, second=0, microsecond=0)
 
-        secs = delta_t.seconds+1
-
-        print("Scheduling wakeup for {}".format(self.run_time))
-        self.t = Timer(secs,scheduled_function)
-        self.t.start()
-        self.t2 = Timer(secs,lambda: self.schedule(alarm_time,am_or_pm,scheduled_function))
-        self.t2.start()
+        self.time_left = self.run_time - time_now
+        
+        self.countdown_hours = int(self.time_left.seconds / 3600)
+        self.countdown_minutes = int(self.time_left.seconds / 60 % 60)
+        self.countdown_seconds = int(self.time_left.seconds % 60)
+        
+        print("Alarm set for: {}".format(self.run_time))
+        print("Time left: {}:{}:{}".format(self.countdown_hours,self.countdown_minutes,self.countdown_seconds))
 
     def cancel(self):
-        self.t.cancel()
-        self.t2.cancel()
+        self.time_left = "00:00:00"
+
+    def tick(self):
+        self.time_left = self.run_time - datetime.now()
+        self.countdown_hours = int(self.time_left.seconds / 3600)
+        self.countdown_minutes = int(self.time_left.seconds / 60 % 60)
+        self.countdown_seconds = int(self.time_left.seconds % 60)
+        if self.countdown_hours == 0 and self.countdown_minutes==0 and self.countdown_seconds==0:
+            self.scheduled_function()
+            self.schedule(self.alarm_time,self.am_or_pm,self.scheduled_function)
 
 def run_functions(function_queue):             
     for function_args_pair in function_queue:
